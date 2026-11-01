@@ -1,0 +1,4368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StackShooter Content Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style id="app-css">
+      :root {
+        /* Brand world: StackShooter charcoal + logo blue, one dark theme. Layout: header + stats, toolbar, 7-col month grid (week list on phones), editor sheet. */
+        --bg: #14171b;
+        --surface: #1b1f25;
+        --surface-2: #232830;
+        --line: #2e343d;
+        --text: #edf0f4;
+        --muted: #98a2b1;
+        --faint: #6b7584;
+        --accent: #3d7bff;
+        --accent-2: #86adff;
+        --accent-soft: rgba(61, 123, 255, 0.14);
+        --reel: #ff6b81;
+        --carousel: #5b8cff;
+        --caption: #f2b64c;
+        --idea: #8a94a3;
+        --drafting: #c99bff;
+        --ready: #5fd0e8;
+        --posted: #3fcb84;
+        --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+        --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+        --r: 14px;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.5 var(--font-body);
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent-2);
+        outline-offset: 2px;
+      }
+      .wrap {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 28px 24px 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      /* header */
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font: 700 15px var(--font-display);
+        letter-spacing: 0.01em;
+      }
+      .brand b {
+        color: var(--accent-2);
+        font-weight: 700;
+      }
+      .brand .sep {
+        color: var(--faint);
+        font-weight: 500;
+      }
+      .brand .sub {
+        color: var(--muted);
+        font: 600 13px var(--font-body);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .mark {
+        width: 26px;
+        height: 26px;
+        flex: none;
+      }
+      .hero {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      h1 {
+        font: 800 clamp(28px, 4.2vw, 44px)/1.08 var(--font-display);
+        margin: 10px 0 8px;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--accent-2);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 62ch;
+        margin: 0;
+      }
+      .platforms {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .plat {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--surface);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .stat .k {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .stat .v {
+        font: 800 28px/1 var(--font-display);
+        font-variant-numeric: tabular-nums;
+      }
+      .stat .v small {
+        font: 600 14px var(--font-body);
+        color: var(--muted);
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+        flex: none;
+      }
+      .bar {
+        height: 6px;
+        border-radius: 6px;
+        background: var(--surface-2);
+        overflow: hidden;
+        margin-top: 6px;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--posted);
+        border-radius: 6px;
+      }
+
+      /* toolbar */
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: var(--bg);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .tgroup {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .seg {
+        display: inline-flex;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 3px;
+      }
+      .seg button {
+        border: 0;
+        background: none;
+        padding: 7px 14px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .seg button[aria-pressed="true"] {
+        background: var(--surface-2);
+        color: var(--text);
+      }
+      .chip {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .chip[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--text);
+        background: var(--accent-soft);
+      }
+      .btn {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-weight: 700;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn:hover {
+        border-color: var(--faint);
+      }
+      .btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .btn.primary:hover {
+        background: #2f6af0;
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .savechip {
+        font-size: 12px;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* format + status pills */
+      .fmt {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+      .fmt.Reel {
+        color: var(--reel);
+        background: rgba(255, 107, 129, 0.12);
+      }
+      .fmt.Carousel {
+        color: var(--carousel);
+        background: rgba(91, 140, 255, 0.14);
+      }
+      .fmt.Caption {
+        color: var(--caption);
+        background: rgba(242, 182, 76, 0.13);
+      }
+      .st {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .st .dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      /* calendar */
+      .cal {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .dow {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        padding: 0 4px;
+      }
+      .cell {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: left;
+        min-width: 0;
+        transition:
+          border-color 0.15s,
+          transform 0.15s;
+      }
+      button.cell:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .cell.empty {
+        background: transparent;
+        border-style: dashed;
+        opacity: 0.45;
+      }
+      .cell.dim {
+        opacity: 0.28;
+      }
+      .cell .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+      .dnum {
+        font: 800 18px var(--font-display);
+        font-variant-numeric: tabular-nums;
+      }
+      .thumb {
+        width: 100%;
+        aspect-ratio: 4/5;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #16191d;
+        display: block;
+        position: relative;
+      }
+      .thumb canvas,
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+      .thumb .own {
+        position: absolute;
+        left: 6px;
+        bottom: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 5px;
+      }
+      .ctitle {
+        font-weight: 700;
+        font-size: 13px;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .cmeta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .ctime {
+        font-size: 12px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* list */
+      .weeks {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+      .week h2 {
+        font: 700 18px var(--font-display);
+        margin: 0 0 4px;
+      }
+      .week p.wsub {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .rows {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: 14px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 12px;
+        text-align: left;
+        width: 100%;
+        align-items: start;
+      }
+      .row:hover {
+        border-color: var(--accent);
+      }
+      .row .thumb {
+        border-radius: 8px;
+      }
+      .rbody {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .rhead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .rhead strong {
+        color: var(--text);
+        font: 700 14px var(--font-display);
+      }
+      .rtitle {
+        font: 700 16px/1.3 var(--font-display);
+        text-wrap: balance;
+      }
+      .rcta {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .rcta b {
+        color: var(--accent-2);
+      }
+
+      /* strategy */
+      .strategy {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 18px;
+      }
+      .card h3 {
+        font: 700 16px var(--font-display);
+        margin: 0 0 10px;
+      }
+      .card ul {
+        margin: 0;
+        padding-left: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .card ul b {
+        color: var(--text);
+      }
+      .kw {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      .kw span {
+        font: 700 12px var(--font-body);
+        letter-spacing: 0.04em;
+        background: var(--accent-soft);
+        color: var(--accent-2);
+        border-radius: 6px;
+        padding: 3px 8px;
+      }
+      .sectitle {
+        font: 700 22px var(--font-display);
+        margin: 10px 0 0;
+      }
+      footer {
+        color: var(--faint);
+        font-size: 13px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+      }
+
+      /* editor */
+      .scrim {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 7, 10, 0.72);
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .sheet {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        width: min(1080px, 100%);
+        max-height: calc(100% - 8px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .shead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+      .shead h2 {
+        margin: 0;
+        font: 700 18px var(--font-display);
+      }
+      .shead .nav {
+        display: flex;
+        gap: 6px;
+      }
+      .icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .sbody {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 22px;
+        padding: 18px;
+        overflow: auto;
+      }
+      .pv {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .pv .thumb {
+        border-radius: 12px;
+        border: 1px solid var(--line);
+      }
+      .pv .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .pvbtns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tips {
+        background: var(--surface-2);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .tips b {
+        color: var(--text);
+      }
+      .tips ul {
+        margin: 6px 0 0;
+        padding-left: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .form {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px 14px;
+        align-content: start;
+      }
+      .f {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+      }
+      .f.w2 {
+        grid-column: span 2;
+      }
+      .f.w4 {
+        grid-column: 1/-1;
+      }
+      .f label {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .f label span {
+        font-weight: 600;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--faint);
+        font-variant-numeric: tabular-nums;
+      }
+      .f input,
+      .f select,
+      .f textarea {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 11px;
+        width: 100%;
+      }
+      .f textarea {
+        resize: vertical;
+        line-height: 1.5;
+      }
+      .f input:focus,
+      .f select:focus,
+      .f textarea:focus {
+        border-color: var(--accent);
+        outline: none;
+      }
+      .statusseg {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .statusseg button {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 9px;
+        padding: 7px 11px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .statusseg button[aria-pressed="true"] {
+        color: var(--text);
+        border-color: currentColor;
+      }
+      .sfoot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 18px;
+        border-top: 1px solid var(--line);
+      }
+      .sfoot .note {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        background: #0d0f12;
+        border: 1px solid var(--line);
+        color: var(--text);
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 40;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        max-width: calc(100% - 32px);
+      }
+      .hidden {
+        display: none !important;
+      }
+
+      @media (max-width: 980px) {
+        .sbody {
+          grid-template-columns: 1fr;
+        }
+        .pv {
+          max-width: 360px;
+        }
+        .stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 720px) {
+        .wrap {
+          padding: 20px 16px 48px;
+        }
+        .toolbar {
+          position: static;
+        }
+        .cal {
+          gap: 5px;
+        }
+        .cell {
+          padding: 5px;
+          border-radius: 9px;
+          gap: 4px;
+        }
+        .cell .ctitle,
+        .cell .cmeta {
+          display: none;
+        }
+        .cell .dnum {
+          font-size: 13px;
+        }
+        .cell .top .fmt {
+          display: none;
+        }
+        .dow {
+          font-size: 10px;
+          letter-spacing: 0.02em;
+          text-align: center;
+          padding: 0;
+        }
+        .scrim {
+          padding: 0;
+          align-items: stretch;
+        }
+        .sheet {
+          border-radius: 0;
+          max-height: none;
+          height: 100%;
+        }
+        .form {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .f.w2 {
+          grid-column: 1/-1;
+        }
+        .row {
+          grid-template-columns: 76px 1fr;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+
+      /* v2 additions */
+      .series {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        background: var(--accent-soft);
+        padding: 3px 8px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+      .rhook {
+        font-size: 14px;
+        color: var(--text);
+        opacity: 0.85;
+        font-style: italic;
+      }
+      .rsolve {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .rsolve b {
+        color: var(--text);
+        font-weight: 700;
+      }
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .sec {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .sec > h3 {
+        margin: 0;
+        font: 800 12px var(--font-body);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sec > h3::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+      .grid4 {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px 14px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 14px;
+      }
+      .item {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .item .ihead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .item .ihead strong {
+        font: 700 14px var(--font-display);
+      }
+      .item .irow {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 10px;
+      }
+      .item .f input,
+      .item .f textarea {
+        background: var(--surface);
+      }
+      .mini {
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .mini:hover {
+        border-color: var(--faint);
+      }
+      .mini.warn {
+        color: #ff8fa0;
+      }
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .f label .bad {
+        color: #ff8fa0;
+      }
+      .sched {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      .sched th,
+      .sched td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      .sched th {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 800;
+      }
+      .sched td:first-child {
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .sched td {
+        color: var(--muted);
+      }
+      .sched td b {
+        color: var(--text);
+      }
+      .tablewrap {
+        overflow-x: auto;
+      }
+      .card.wide {
+        grid-column: 1/-1;
+      }
+      .card p.small {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 10px 0 0;
+      }
+      .card textarea {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 11px;
+        margin-top: 8px;
+        resize: vertical;
+        line-height: 1.5;
+      }
+      .times {
+        font-size: 12px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      @media (max-width: 720px) {
+        .grid4,
+        .grid2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .item .irow {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="application/json" id="state">
+      {
+        "year": 2026,
+        "month": 10,
+        "savedAt": 0,
+        "style": "premium 3D render, deep charcoal background (#16191D), electric blue (#3D7BFF) and soft sky-blue (#86ADFF) accents, glossy glass and matte materials, soft volumetric studio lighting with a subtle blue rim light, clean minimal composition with empty space for headline text, high detail, no text, no letters, no logos, no people",
+        "posts": [
+          {
+            "d": 1,
+            "pillar": "Launch",
+            "style": "3D motion graphics",
+            "series": "",
+            "title": "StackShooter is officially live.",
+            "hl": "officially live.",
+            "hooks": [
+              "Your website is open 24/7. So why isn't it bringing clients 24/7?",
+              "Remember \"Something new is coming\"? It's here.",
+              "Stop scrolling if your website hasn't brought you a single client this month."
+            ],
+            "problem": "Most business websites look okay but never bring enquiries: slow, outdated, built once and forgotten, managed through middlemen.",
+            "solution": "StackShooter builds fast websites, online stores, custom software and apps with senior engineers, designed to bring customers.",
+            "scenes": [
+              {
+                "t": "0–2s",
+                "v": "Extreme close-up of a glowing loading spinner on a dusty old browser window, camera pushes in fast, the spinner cracks into glass shards",
+                "txt": "Your website is open 24/7…"
+              },
+              {
+                "t": "2–5s",
+                "v": "An empty 3D shop counter inside a browser window, a small notification card reading 0 enquiries floats up and fades",
+                "txt": "…so why isn't it bringing clients?"
+              },
+              {
+                "t": "5–9s",
+                "v": "Camera flies through the broken spinner into darkness; a blue light streak shoots across and forms three stacked slanted bars (logo shape)",
+                "txt": "Meet StackShooter"
+              },
+              {
+                "t": "9–15s",
+                "v": "Fast montage, one object per beat: a glass browser window assembling itself, a shopping bag with a checkout tick, a dashboard with rising bar chart, a smartphone with app tiles popping out, a map pin dropping onto a city",
+                "txt": "Websites · Stores · Software · Apps · SEO"
+              },
+              {
+                "t": "15–19s",
+                "v": "All objects orbit the centre then snap into one clean row; a speedometer needle slams into the green zone",
+                "txt": "Built fast. Built to sell."
+              },
+              {
+                "t": "19–23s",
+                "v": "End card: charcoal background, logo, website URL, soft blue pulse",
+                "txt": "We design. We build. You grow. → DM \"AUDIT\""
+              }
+            ],
+            "vo": "Aapki website 24 ghante khuli hai… phir bhi clients kyun nahi aa rahe? Kyunki slow aur purani website customer ko seedha competitor ke paas bhej deti hai. Isliye aaya hai StackShooter. Websites, online stores, custom software aur apps — fast, modern, aur sales ke liye built. We design. We build. You grow. Free website audit ke liye abhi DM karo 'AUDIT'.",
+            "audio": "Cinematic riser into a punchy tech beat. Whoosh on every cut, a glass 'ting' when the logo forms.",
+            "caption": "Picture this: your website has been live for two years. It looks fine. It just… never brings anyone. 😶\n\nThat's the story of most business websites. Slow, outdated, built once and forgotten. A shop with the lights off.\n\nThat's why we built StackShooter. 🚀\n\nWe design and build fast websites, online stores, custom software and apps that do one job: bring you customers.\n\n⚡ Sub-second loading\n👨‍💻 Direct access to senior engineers, no middlemen\n📈 Built for enquiries, not just looks\n\nWe design. We build. You grow.\n\n👉 DM \"AUDIT\" for a free speed & architecture audit\n➕ Follow @stackshooterofficial: every week we break down what's stopping businesses from growing online.",
+            "tags": "#StackShooter #WebDevelopment #WebsiteDesign #SmallBusinessIndia #StartupIndia",
+            "tags2": "#DigitalGrowth #SoftwareCompany",
+            "cta": "DM AUDIT",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "12:30 PM",
+              "fb": "12:30 PM",
+              "li": "12:30 PM (launch)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 2,
+            "pillar": "Services",
+            "title": "6 things we build for growing businesses",
+            "hl": "growing businesses",
+            "problem": "Businesses juggle separate freelancers for website, store, app and marketing; nothing connects and nobody owns the result.",
+            "solution": "One team for websites, e-commerce, web & mobile apps, custom software and digital growth.",
+            "slides": [
+              {
+                "copy": "Tired of managing 5 freelancers for one business?\nEverything you need to grow online. One team.",
+                "prompt": "Five tangled glowing cables knotted in the centre, untangling into one clean straight blue cable"
+              },
+              {
+                "copy": "1 · Websites\nFast, custom, built to convert.\nDesign · Redesign · CMS · Maintenance",
+                "prompt": "A floating glossy glass browser window with abstract layout blocks and a small lightning-bolt icon on top"
+              },
+              {
+                "copy": "2 · Online stores\nShopify · WooCommerce · Headless\nPayments + courier built in",
+                "prompt": "A frosted-glass shopping bag with a glowing checkmark tag, a small delivery box and a payment card floating beside it"
+              },
+              {
+                "copy": "3 · Web apps\nReact · Next.js · MERN · Node.js · PHP",
+                "prompt": "Isometric stack of floating code blocks and interface panels connected by thin glowing lines"
+              },
+              {
+                "copy": "4 · Mobile apps\nAndroid · iOS · Cross-platform",
+                "prompt": "Two sleek smartphones at angles with abstract app tiles popping out of the screens as glossy cubes"
+              },
+              {
+                "copy": "5 · Custom software\nCRM · ERP · Booking · Membership · SaaS",
+                "prompt": "A dashboard tablet with rising bar charts, with gears and a calendar icon orbiting it"
+              },
+              {
+                "copy": "6 · Digital growth\nSEO · Google Business Profile · Google Ads · Social media",
+                "prompt": "A map pin and magnifying glass hovering over a rising arrow graph above a city grid"
+              },
+              {
+                "copy": "Which one does your business need first?\nComment 1–6 👇\nFollow @stackshooterofficial",
+                "prompt": "Three stacked slanted glowing bars at the centre with rings of light radiating outward"
+              }
+            ],
+            "caption": "Picture this: one freelancer built your website. Another runs your ads. A third \"manages\" your app. When something breaks, everyone blames someone else. 😮‍💨\n\nSound familiar?\n\nStackShooter is one team for everything your business needs online:\n1️⃣ Websites that load fast and convert\n2️⃣ Online stores with payments + shipping built in\n3️⃣ Custom web apps on modern stacks\n4️⃣ Android & iOS apps\n5️⃣ CRM, ERP, booking & SaaS software\n6️⃣ SEO, Google Business & ads to bring the traffic\n\nNo middlemen. You talk directly to the engineers building your product.\n\n💬 Comment the number your business needs first.\n💾 Save this for when you're ready.\n➕ Follow @stackshooterofficial",
+            "tags": "#WebDevelopment #AppDevelopment #CustomSoftware #SmallBusinessIndia #StackShooter",
+            "tags2": "#DigitalAgency #StartupIndia",
+            "cta": "Comment 1–6",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 3,
+            "pillar": "Speed",
+            "style": "Faceless UGC (screen recording) + motion graphics",
+            "series": "Website Doctor · Ep 1",
+            "title": "Your website has 3 seconds.",
+            "hl": "3 seconds.",
+            "hooks": [
+              "This spinner just cost you a customer. 👇",
+              "Count with me: 1… 2… 3… your customer just left.",
+              "Your website has 3 seconds. Then they're gone."
+            ],
+            "problem": "Slow websites lose visitors before they see anything, and owners never find out.",
+            "solution": "Lightweight, custom builds that load in under a second, plus speed fixes for existing sites.",
+            "scenes": [
+              {
+                "t": "0–2s",
+                "v": "Screen recording on a phone: tap a Google result, white screen with a loading spinner. A chunky 3D number '1' pops over it",
+                "txt": "This spinner just cost you a customer."
+              },
+              {
+                "t": "2–5s",
+                "v": "3D numbers '2' then '3' pop in time with a ticking clock; on '3' the screen swipes back to Google results",
+                "txt": "1… 2… 3… gone."
+              },
+              {
+                "t": "5–9s",
+                "v": "Screen recording: the next result (a demo competitor site) opens instantly; a motion-graphic coin flies from the first site to the second",
+                "txt": "Straight to your competitor."
+              },
+              {
+                "t": "9–14s",
+                "v": "Clean stat card slides in with an animated bar filling past the halfway mark",
+                "txt": "Over half of mobile visitors leave if a page takes 3+ seconds (Google)"
+              },
+              {
+                "t": "14–20s",
+                "v": "3D speedometer: needle in red sweeps to green while three labels burst and vanish: heavy images, too many plugins, cheap hosting",
+                "txt": "We fix what slows you down."
+              },
+              {
+                "t": "20–25s",
+                "v": "End card with a 'Website Doctor' badge and a stethoscope icon",
+                "txt": "Free speed check → DM \"SPEED\""
+              }
+            ],
+            "vo": "Ruko… gino. Ek… do… teen. Gaya customer. Aur seedha aapke competitor ke paas. Google ke hisaab se aadhe se zyada mobile visitors 3 second se zyada wait nahi karte. Heavy images, bahut saare plugins, sasti hosting — yahi asli villain hain. StackShooter aapki website ko sub-second fast banata hai. Free speed check chahiye? DM karo 'SPEED'.",
+            "audio": "Ticking clock on the countdown, a record-scratch on 'gone', then an upbeat beat.",
+            "caption": "Picture this: someone searches for exactly what you sell. They tap your website. ⏳\n\nWhite screen. Spinner. One second. Two. Three.\n\nThey hit back and tap your competitor instead. You never even knew they were there.\n\nGoogle's research found that more than half of mobile visitors leave a page that takes longer than 3 seconds to load. That's not a design problem. That's lost revenue.\n\nWe build lightweight, custom websites with no bloated plugins, so pages open in under a second.\n\n👉 DM \"SPEED\" and we'll check your website for free.\n➕ Follow for Website Doctor, our weekly series fixing real website problems.",
+            "tags": "#WebsiteSpeed #PageSpeed #WebDevelopment #SmallBusinessIndia #StackShooter",
+            "tags2": "#CoreWebVitals #WebPerformance",
+            "cta": "DM SPEED",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 4,
+            "pillar": "Process",
+            "title": "Why we started StackShooter",
+            "hl": "StackShooter",
+            "problem": "Business websites are slow, plugin-heavy, built through middlemen and don't bring enquiries.",
+            "solution": "A studio where owners work directly with senior engineers and every build is light, custom and measured in leads.",
+            "slides": [
+              {
+                "copy": "\"Businesses don't need more plugins.\nThey need systems that work.\"\n— StackShooter",
+                "prompt": "A tangled heap of small plugin blocks on the left dissolving into one clean glowing engine block on the right"
+              }
+            ],
+            "caption": "Most business websites have the same 3 problems:\n\n→ They're slow, built on 30+ plugins nobody maintains\n→ The owner never talks to the person actually building it\n→ They look nice but don't bring a single enquiry\n\nWe kept seeing businesses pay for websites that did nothing for them. So we started StackShooter.\n\nA studio where you talk directly to senior engineers. Where every site is built light and custom. Where success means leads and sales, not just \"looks good\".\n\nWebsites. Online stores. Custom software. Apps. Built to grow your business.\n\n👉 If that's what you've been looking for, book a free 15-minute call. Link in bio.\n➕ Follow along as we build in public.",
+            "tags": "#StackShooter #FounderStory #StartupIndia #WebDevelopment #BuildInPublic",
+            "tags2": "#Entrepreneurship #SoftwareDevelopment",
+            "cta": "Book a 15-min call",
+            "fmt": "Caption",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 5,
+            "pillar": "Industry",
+            "style": "3D motion graphics + UGC chat animation",
+            "series": "Industry Fix · Ep 1",
+            "title": "Real estate websites that bring buyers, not just visitors",
+            "hl": "bring buyers,",
+            "hooks": [
+              "Your property website gets visits. So why is your phone silent?",
+              "Builders & brokers: this is where your leads disappear. 👇",
+              "Buyers don't want a brochure. They want a button."
+            ],
+            "problem": "Property websites act like PDF brochures. Enquiries get scattered across WhatsApp and calls, leads get lost, and follow-ups are forgotten.",
+            "solution": "A lead-generating property website plus a CRM: smart search, one-tap WhatsApp enquiry, every lead captured with follow-up reminders.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Miniature 3D city of glass apartment towers at night; one tower lights up; a phone beside it shows 0 new enquiries",
+                "txt": "Your property website gets visits…"
+              },
+              {
+                "t": "3–6s",
+                "v": "Screen recording: scrolling a slow, cluttered demo property site; a tiny 'Contact us' link sits at the very bottom",
+                "txt": "…but buyers can't find the button."
+              },
+              {
+                "t": "6–11s",
+                "v": "Motion graphic: WhatsApp bubbles, call icons and emails pour into a 3D funnel with a hole; leads drop into the void",
+                "txt": "Leads lost in chats, calls & missed follow-ups"
+              },
+              {
+                "t": "11–18s",
+                "v": "A glass browser window assembles: search filters (City, Budget, BHK), a listing card with photos and a map pin, a big green WhatsApp button pulsing",
+                "txt": "Smart search · Fast galleries · 1-tap WhatsApp"
+              },
+              {
+                "t": "18–23s",
+                "v": "Each enquiry flows into a clean CRM dashboard; tags pop on cards ('Hot lead', 'Site visit Sat'); a reminder bell rings",
+                "txt": "Every lead captured. Every follow-up on time."
+              },
+              {
+                "t": "23–27s",
+                "v": "End card",
+                "txt": "For builders, brokers & agencies → DM \"PROPERTY\""
+              }
+            ],
+            "vo": "Aapki property website pe visitors aate hain… phir bhi phone silent kyun hai? Kyunki website ek brochure hai, system nahi. Enquiry WhatsApp mein kho jaati hai, call miss ho jaati hai, follow-up bhool jaate ho. StackShooter banata hai lead-generating property website — smart search, fast galleries, ek tap WhatsApp — aur ek CRM jahan har lead save hoti hai aur har follow-up time pe hota hai. Demo dekhna hai? DM karo 'PROPERTY'.",
+            "audio": "Low ambient city sound, beat drops at 11s when the new website builds.",
+            "caption": "Picture a buyer at 11 PM, scrolling flats on their phone. 🏢\n\nThey find your project. They like it. They look for a button to ask the price… and there isn't one. Just a PDF brochure and a tiny \"Contact us\" at the bottom.\n\nSo they message three other builders instead.\n\nMost real estate websites are brochures. Buyers want answers in one tap. A lead-generating property website gives them:\n✅ Search by city, budget & BHK\n✅ Fast photo galleries & maps\n✅ One-tap WhatsApp & call\n✅ Every enquiry saved in a CRM with follow-up reminders\n\n👉 DM \"PROPERTY\" to see a demo.\n➕ Follow for Industry Fix, every Thursday.",
+            "tags": "#RealEstateIndia #RealEstateMarketing #PropertyWebsite #LeadGeneration #StackShooter",
+            "tags2": "#RealEstateCRM #BuildersAndDevelopers",
+            "cta": "DM PROPERTY",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 6,
+            "pillar": "Tips",
+            "title": "7 signs your website is losing you clients",
+            "hl": "losing you clients",
+            "problem": "Websites get visitors but no enquiries because of slow speed, bad mobile layout, missing CTAs and trust issues.",
+            "solution": "Free speed & architecture audit, then fixes or a rebuild.",
+            "slides": [
+              {
+                "copy": "7 signs your website is losing you clients\n(Count how many you have 👀)",
+                "prompt": "A glass browser window leaking glowing coins through a crack at the bottom"
+              },
+              {
+                "copy": "1. It takes 3+ seconds to load",
+                "prompt": "An hourglass with glowing blue sand next to a spinning loading ring"
+              },
+              {
+                "copy": "2. It looks broken on mobile",
+                "prompt": "A smartphone with layout blocks spilling out over the screen edges, misaligned"
+              },
+              {
+                "copy": "3. No clear Call / WhatsApp / Book button",
+                "prompt": "A cursor hovering over an empty dotted outline where a button should be"
+              },
+              {
+                "copy": "4. You're not on Google Maps",
+                "prompt": "A city map grid with several glowing pins and one empty faded spot"
+              },
+              {
+                "copy": "5. Your footer still says ©2019",
+                "prompt": "A dusty old monitor with cobwebs and a faded calendar page"
+              },
+              {
+                "copy": "6. The browser says \"Not secure\"",
+                "prompt": "A broken padlock with an amber warning triangle glowing behind it"
+              },
+              {
+                "copy": "7. Visitors, but zero enquiries",
+                "prompt": "An empty inbox tray with a small tumbleweed, an analytics graph floating above"
+              },
+              {
+                "copy": "Ticked 2 or more?\nGet a free website audit → DM \"AUDIT\"",
+                "prompt": "A magnifying glass scanning a browser window that reveals a glowing checklist"
+              }
+            ],
+            "caption": "Picture this: your website gets visitors every day. Your phone stays quiet. 📵 Where are they going?\n\nUsually, one of these 7 problems is quietly sending them to your competitors:\n1. Loads in 3+ seconds\n2. Looks broken on mobile\n3. No clear call, WhatsApp or booking button\n4. Not on Google Maps\n5. Footer still says ©2019\n6. \"Not secure\" warning\n7. Visitors, but no enquiries\n\nCount yours honestly. Two or more means you're losing clients right now.\n\n💾 Save this and check your site tonight.\n👉 DM \"AUDIT\" for a free speed & architecture audit.\n➕ Follow for weekly website fixes.",
+            "tags": "#WebsiteTips #WebsiteAudit #SmallBusinessIndia #WebDesign #StackShooter",
+            "tags2": "#SEO #BusinessGrowth",
+            "cta": "Save + DM AUDIT",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 7,
+            "pillar": "Process",
+            "style": "3D motion graphics",
+            "series": "",
+            "title": "From brief to live in 7–14 days",
+            "hl": "7–14 days",
+            "hooks": [
+              "Why do websites take months? Ours take 7–14 days.",
+              "Watch a website build itself. 🧱",
+              "Every step of a 14-day website build, in 25 seconds."
+            ],
+            "problem": "Website projects drag on for months with no visibility; owners chase freelancers for updates.",
+            "solution": "A clear 7–14 day process for business websites (3–6 weeks for apps/ERP) with updates at every step.",
+            "scenes": [
+              {
+                "t": "0–2s",
+                "v": "Isometric empty plot on a charcoal grid with a large glowing 3D counter reading 14",
+                "txt": "A website in 14 days. Watch."
+              },
+              {
+                "t": "2–6s",
+                "v": "Blueprint lines draw themselves on the grid, forming the wireframe of a web page; counter ticks Day 1–3",
+                "txt": "Day 1–3 · Brief & wireframes"
+              },
+              {
+                "t": "6–10s",
+                "v": "Coloured glass blocks drop from above and snap onto the wireframe: header, hero, cards",
+                "txt": "Day 4–6 · Design"
+              },
+              {
+                "t": "10–16s",
+                "v": "Streams of code particles rise like a construction crane and fill the blocks; small gears spin inside",
+                "txt": "Day 7–12 · Development"
+              },
+              {
+                "t": "16–20s",
+                "v": "The finished site rotates; three 3D phones scan it with blue light; green ticks pop",
+                "txt": "Day 13–14 · Testing on real phones"
+              },
+              {
+                "t": "20–25s",
+                "v": "A small rocket launches from the rooftop with confetti; a URL bar appears reading yourbusiness.com",
+                "txt": "Launch 🚀 Updates at every step."
+              }
+            ],
+            "vo": "Website banwane mein mahine kyun lagte hain? Humare yahan 7 se 14 din. Day 1 se 3 — brief aur wireframe. 4 se 6 — design. 7 se 12 — development. 13 aur 14 — real phones pe testing. Aur phir… launch. Har step pe aapko update milta hai. Bade projects jaise web apps ya ERP — 3 se 6 hafte. Apna project shuru karna hai? Link in bio.",
+            "audio": "Satisfying build SFX (clicks, snaps, whooshes) over a trending upbeat track.",
+            "caption": "Picture this: you hired someone to build your website in March. It's November. You're still waiting for \"final changes\". 😩\n\nThat's the most common story we hear about website projects.\n\nHere's how we do it instead:\n📞 Day 1–3: Brief & wireframes\n🎨 Day 4–6: Design\n💻 Day 7–12: Development\n🧪 Day 13–14: Testing on real phones\n🚀 Launch, with updates at every step\n\nBigger builds like web apps, SaaS or ERP take 3–6 weeks, with the same clear steps.\n\n👉 Send us your brief and get a reply within 2 hours. Link in bio.\n➕ Follow to watch more builds come to life.",
+            "tags": "#WebDevelopment #WebDesignProcess #StartupIndia #SmallBusinessIndia #StackShooter",
+            "tags2": "#MotionGraphics #BehindTheBuild",
+            "cta": "Send a brief (link in bio)",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "8:30 PM",
+              "fb": "8:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 8,
+            "pillar": "Engagement",
+            "title": "What's your business missing right now?",
+            "hl": "missing",
+            "problem": "Owners aren't sure which digital step will grow their business most.",
+            "solution": "Personal tips in reply to every answer; shows the full range of services.",
+            "slides": [
+              {
+                "copy": "What's your business missing most right now?\nA) A proper website\nB) An online store\nC) A mobile app\nD) More leads from Google",
+                "prompt": "Four glass tiles in a 2×2 grid, each with a simple icon: browser window, shopping bag, smartphone, map pin"
+              }
+            ],
+            "caption": "Quick question for business owners 👇\n\nPicture your business 12 months from now, doing twice the sales. What's the ONE thing that got you there?\n\nA) A proper website\nB) An online store\nC) A mobile app\nD) More leads from Google\n\nComment your letter. We'll reply to every answer with one free tip for your situation. 💬\n\nAlso running this as a poll in our Stories today. Vote there too!\n➕ Follow @stackshooterofficial: we answer questions like these every week.",
+            "tags": "#SmallBusinessIndia #BusinessOwner #Entrepreneur #BusinessGrowth #StackShooter",
+            "tags2": "#DigitalPresence #AskUs",
+            "cta": "Comment A, B, C or D",
+            "fmt": "Caption",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": {
+              "ig": "12:30 PM",
+              "fb": "12:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 9,
+            "pillar": "Services",
+            "title": "Shopify vs WooCommerce vs Custom: which store fits you?",
+            "hl": "which store",
+            "problem": "Store owners pick a platform on a friend's advice, then face app fees, slow sites or a full rebuild a year later.",
+            "solution": "Honest platform advice and store builds on Shopify, WooCommerce or custom/headless, with payments and courier integrated.",
+            "slides": [
+              {
+                "copy": "Shopify vs WooCommerce vs Custom\nWhich store is right for you?",
+                "prompt": "Three glass pedestals of different heights, each holding a shopping bag, spotlights from above"
+              },
+              {
+                "copy": "Shopify\n✅ Fastest to launch ✅ Easy to manage\n⚠️ Monthly fees + app costs\nBest for: D2C brands starting out",
+                "prompt": "A shopping bag with a small rocket tag and a launch trail"
+              },
+              {
+                "copy": "WooCommerce\n✅ Flexible, WordPress-based ✅ Huge plugin choice\n⚠️ Needs strong hosting & care\nBest for: content-heavy stores",
+                "prompt": "A shopping bag connected to puzzle pieces and a small server tower"
+              },
+              {
+                "copy": "Custom / Headless\n✅ Fastest performance ✅ Fully yours, no limits\n⚠️ Higher upfront build\nBest for: brands ready to scale",
+                "prompt": "A shopping bag sitting on a sleek engine block with speed lines"
+              },
+              {
+                "copy": "Quick compare\nSpeed · Cost · Control · Scale\n(add a simple 3-column table in your design tool)",
+                "prompt": "Three glowing columns of different heights in a clean comparison grid, empty space for labels"
+              },
+              {
+                "copy": "Must-haves on ANY platform\nPayment gateway · Courier integration · Mobile checkout · Fast product pages",
+                "prompt": "A payment card, delivery truck and smartphone arranged in a triangle, linked by light lines"
+              },
+              {
+                "copy": "Our rule\nPick for where you'll be in 2 years, not just today.",
+                "prompt": "A staircase of glass blocks rising toward a glowing target ring"
+              },
+              {
+                "copy": "Not sure? We'll tell you honestly.\nDM \"STORE\" · Follow @stackshooterofficial",
+                "prompt": "A chat bubble with a shopping-cart icon, soft glow"
+              }
+            ],
+            "caption": "Picture this: you launch your store on a platform a friend recommended. A year later you're paying for 15 apps, the site is slow, and moving away means rebuilding everything. 🛒\n\nChoosing the wrong platform is one of the most expensive mistakes in e-commerce.\n\n🟢 Shopify: quickest launch, monthly fees\n🔵 WooCommerce: flexible, needs strong hosting\n🟣 Custom/headless: fastest and fully yours, best for scale\n\nWhatever you choose, don't launch without a payment gateway, courier integration and a smooth mobile checkout.\n\n💾 Save this before you choose.\n👉 DM \"STORE\" and we'll tell you which fits your business, honestly.\n➕ Follow for no-nonsense e-commerce advice.",
+            "tags": "#Ecommerce #Shopify #WooCommerce #EcommerceIndia #StackShooter",
+            "tags2": "#D2CIndia #OnlineStore",
+            "cta": "DM STORE",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 10,
+            "pillar": "Tips",
+            "style": "Faceless UGC (screen recording) + motion graphics",
+            "series": "Website Doctor · Ep 2",
+            "title": "Not on Google Maps? You're invisible.",
+            "hl": "invisible.",
+            "hooks": [
+              "Search \"near me\" for your own business. Not there? Watch this.",
+              "Your customer is searching for you right now. Google is showing them your competitor.",
+              "The free tool that brings more calls than ads. 📍"
+            ],
+            "problem": "Local businesses are missing or incomplete on Google Maps, so people searching \"near me\" call competitors.",
+            "solution": "Google Business Profile setup and optimisation plus local SEO.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Phone screen recording: typing '[your service] near me' into Google; the map results load with three listings",
+                "txt": "Search your own business. Are you here?"
+              },
+              {
+                "t": "3–6s",
+                "v": "A 3D map pin with a shop icon falls off the map and fades away",
+                "txt": "If not, customers can't find you."
+              },
+              {
+                "t": "6–10s",
+                "v": "Screen recording: tapping a demo listing with call button, photos and star rating (blur any real names)",
+                "txt": "They call whoever shows up first."
+              },
+              {
+                "t": "10–18s",
+                "v": "Checklist ticks in with 3D icons: shield (verify), camera (photos), clock (hours), tag (category), star (reviews)",
+                "txt": "Claim · Photos · Hours · Category · Reviews"
+              },
+              {
+                "t": "18–22s",
+                "v": "A 3D map pin rises from the city with a glow; a phone-ringing icon pulses beside it",
+                "txt": "Show up. Get calls."
+              },
+              {
+                "t": "22–26s",
+                "v": "End card with the 'Website Doctor' badge",
+                "txt": "We'll set it up → DM \"MAPS\""
+              }
+            ],
+            "vo": "Ek kaam karo — Google pe apni hi service ke liye 'near me' search karo. Aap dikhe? Nahi? Toh customer aapke competitor ko call kar raha hai. Google Business Profile free hai, aur sahi set ho toh ads se zyada calls la sakta hai. Profile claim karo, real photos daalo, timing aur category sahi rakho, aur reviews maango. Ye sab hum aapke liye set kar dete hain. DM karo 'MAPS'.",
+            "audio": "Notification pings and a soft 'drop' sound for map pins, light trending beat underneath.",
+            "caption": "Picture this: someone 2 km away needs exactly what you offer. They type \"near me\" into Google. 📍\n\nThree businesses show up. Yours isn't one of them.\n\nThey call the first one. Done. You lost a customer you never knew existed.\n\nThe fix is free: your Google Business Profile.\n1. Claim and verify your listing\n2. Add real photos, hours and the right category\n3. Ask happy customers for reviews (and reply to every one)\n\n👉 Want us to set it up and optimise it? DM \"MAPS\".\n➕ Follow for Website Doctor: one fix every Tuesday.",
+            "tags": "#GoogleBusinessProfile #LocalSEO #GoogleMaps #SmallBusinessIndia #StackShooter",
+            "tags2": "#LocalBusiness #DigitalMarketing",
+            "cta": "DM MAPS",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 11,
+            "pillar": "Speed",
+            "title": "Plugins are not features.",
+            "hl": "not features.",
+            "problem": "Plugin-heavy websites become slow, fragile and insecure over time.",
+            "solution": "Lightweight, custom, modular builds that add features without bloat or rewrites.",
+            "slides": [
+              {
+                "copy": "30 plugins ≠ 30 features.\nIt's 30 ways to slow down and get hacked.",
+                "prompt": "A wobbling tower of mismatched plugin blocks about to topple, next to a single sleek stable glowing block"
+              }
+            ],
+            "caption": "Unpopular opinion: plugins are not features. 🔌\n\nPicture a website that needed a contact form, so someone installed a plugin. Then a slider plugin. A popup plugin. A cache plugin to fix the slowness the other plugins caused…\n\nTwo years later: dozens of plugins, a 6-second load time and a security warning.\n\nEvery plugin is more code to load, one more thing that can break, and one more door for hackers.\n\nWe build lightweight and custom instead. Modular, so new features can be added later without a rewrite.\n\n💬 Agree or disagree? Let's hear it.\n➕ Follow for more honest takes on building for the web.",
+            "tags": "#WebDevelopment #WordPress #WebSecurity #CleanCode #StackShooter",
+            "tags2": "#WebPerformance #SoftwareEngineering",
+            "cta": "Agree or disagree?",
+            "fmt": "Caption",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 12,
+            "pillar": "Industry",
+            "style": "3D motion graphics",
+            "series": "Industry Fix · Ep 2",
+            "title": "Get direct bookings. Skip the commissions.",
+            "hl": "direct bookings.",
+            "hooks": [
+              "Every booking from an app has a hidden fee. Here's how to stop paying it.",
+              "Your guests love you. So why are you paying someone else to bring them back?",
+              "Hotel owners: who's really earning from your rooms?"
+            ],
+            "problem": "Hotels and restaurants rely on booking apps that take commission on every booking, even from repeat guests.",
+            "solution": "An own website with a booking engine, online payments, WhatsApp confirmations and local SEO.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Miniature 3D hotel; a booking card slides in; a robotic arm snips a slice off the card",
+                "txt": "Every app booking has a hidden fee."
+              },
+              {
+                "t": "3–7s",
+                "v": "Coins flow out of the hotel into a large glowing generic app-shaped vault (no real brand)",
+                "txt": "Even on your repeat guests."
+              },
+              {
+                "t": "7–14s",
+                "v": "Camera pushes into a glass browser window on the hotel: date picker, room cards, a glowing 'Book direct' button",
+                "txt": "Your own booking engine"
+              },
+              {
+                "t": "14–19s",
+                "v": "Payment tick → WhatsApp confirmation bubble → a calendar slot fills",
+                "txt": "Pay online · Instant WhatsApp confirmation"
+              },
+              {
+                "t": "19–23s",
+                "v": "Coins now flow back into the hotel; a 'Direct' badge appears on the roof",
+                "txt": "Keep apps for discovery. Get repeats direct."
+              },
+              {
+                "t": "23–27s",
+                "v": "End card",
+                "txt": "Hotels · Resorts · Cafés · Restaurants → DM \"BOOKING\""
+              }
+            ],
+            "vo": "Har app booking pe ek chupa hua kharcha hota hai — commission. Aur woh bhi un guests pe, jo pehle bhi aapke yahan aa chuke hain. Apps ko discovery ke liye rakho, lekin repeat guests ko apni website pe lao. StackShooter banata hai booking engine wali website — online payment, instant WhatsApp confirmation, aur Google pe dikhne ke liye local SEO. Direct bookings shuru karni hain? DM karo 'BOOKING'.",
+            "audio": "Cash-register 'ka-ching' reversed when coins leave, normal when they return; warm lo-fi beat.",
+            "caption": "Picture this: a family loved their stay at your hotel. 🏨 Six months later they book again… through an app. And you pay commission on a guest who was already yours.\n\nThat's how many hotels, resorts and restaurants lose margin quietly, every month.\n\nHere's the fix:\n✅ Your own website with a booking engine\n✅ Online payments\n✅ Instant WhatsApp & email confirmations\n✅ Local SEO so guests find you directly\n\nKeep the apps for discovery. Bring your repeat guests home.\n\n👉 DM \"BOOKING\" to see how it works.\n➕ Follow for Industry Fix every Thursday.",
+            "tags": "#HotelMarketing #DirectBooking #HospitalityIndia #RestaurantMarketing #StackShooter",
+            "tags2": "#BookingEngine #HotelWebsite",
+            "cta": "DM BOOKING",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 13,
+            "pillar": "Tips",
+            "title": "Website launch checklist: 10 things before you go live",
+            "hl": "go live",
+            "problem": "Launch-day problems (broken forms, no SSL, no tracking) cost leads from day one.",
+            "solution": "Launch QA and setup handled end to end: domain, hosting, email, SEO basics, analytics, backups.",
+            "slides": [
+              {
+                "copy": "Launching a website?\n10 things to check before you go live",
+                "prompt": "A rocket on a launch pad shaped like a laptop, a checklist hologram beside it"
+              },
+              {
+                "copy": "1. Tested on 3 real phones",
+                "prompt": "Three smartphones of different sizes standing side by side, scanned by blue light beams"
+              },
+              {
+                "copy": "2. Speed score checked (PageSpeed Insights)",
+                "prompt": "A speedometer gauge with the needle in the green zone"
+              },
+              {
+                "copy": "3. SSL / https working",
+                "prompt": "A glowing padlock in front of a shield"
+              },
+              {
+                "copy": "4. Forms actually deliver\n5. WhatsApp & call buttons work",
+                "prompt": "A paper plane flying into an inbox tray, a phone handset icon beside it"
+              },
+              {
+                "copy": "6. Analytics + Search Console connected",
+                "prompt": "Floating analytics charts and a magnifying glass connected by light lines"
+              },
+              {
+                "copy": "7. Meta titles & descriptions written\n8. Favicon & share image set",
+                "prompt": "A floating search-result card and a small app-icon tile"
+              },
+              {
+                "copy": "9. Backups & uptime monitoring on",
+                "prompt": "A cloud with an upload arrow and a glowing heartbeat line"
+              },
+              {
+                "copy": "10. Business email on your domain",
+                "prompt": "An envelope with an @ symbol and a glowing domain tag"
+              },
+              {
+                "copy": "Save this for launch day 📌\nOr let us handle all 10 → DM \"LAUNCH\"",
+                "prompt": "A bookmark ribbon over a checklist with every item ticked"
+              }
+            ],
+            "caption": "Picture this: launch day. You share the link everywhere. 🎉 Two days later a customer messages: \"Your contact form doesn't work.\"\n\nHow many enquiries did you miss?\n\nMost launch-day disasters come from small things nobody checked:\n✅ Tested on real phones\n✅ Speed score checked\n✅ SSL (https) working\n✅ Forms actually deliver\n✅ WhatsApp & call buttons work\n✅ Analytics + Search Console connected\n✅ Meta titles & descriptions written\n✅ Favicon & share image set\n✅ Backups & uptime monitoring on\n✅ Business email on your domain\n\n💾 Save this, and send it to someone launching this month.\n👉 Or DM \"LAUNCH\" and we'll check all 10 for you.\n➕ Follow for more checklists like this.",
+            "tags": "#WebsiteLaunch #WebsiteChecklist #WebDevelopment #SmallBusinessIndia #StackShooter",
+            "tags2": "#SEO #StartupIndia",
+            "cta": "Save + DM LAUNCH",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 14,
+            "pillar": "Trends",
+            "style": "3D motion graphics (toy style)",
+            "series": "",
+            "title": "Explaining my job to a 5-year-old",
+            "hl": "5-year-old",
+            "hooks": [
+              "Explaining website development to a 5-year-old 🧸",
+              "If a 5-year-old gets this, so will your business.",
+              "Website development, explained with toys."
+            ],
+            "problem": "Business owners find tech jargon confusing and don't see why speed and design matter.",
+            "solution": "StackShooter explains tech simply and builds for clear outcomes: more visitors, more customers.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Cute rounded 3D toy blocks on a soft playmat, a tiny toy shop counter",
+                "txt": "Website development, explained to a 5-year-old"
+              },
+              {
+                "t": "3–7s",
+                "v": "Blocks stack themselves into a small house with a shop sign",
+                "txt": "We build houses… on the internet."
+              },
+              {
+                "t": "7–11s",
+                "v": "Tiny round toy figures roll in through the door; a coin jingles",
+                "txt": "Shops live inside. People visit."
+              },
+              {
+                "t": "11–15s",
+                "v": "A second house has a sleepy snail at the door; the toy figures turn around and roll next door",
+                "txt": "Slow house? They go next door."
+              },
+              {
+                "t": "15–20s",
+                "v": "A rocket-shaped house zooms up with sparkles; toy figures bounce happily",
+                "txt": "Fast, pretty house = lots of visitors"
+              },
+              {
+                "t": "20–24s",
+                "v": "End card with balloons",
+                "txt": "Happy Children's Day 🎈 Follow for tech, made simple"
+              }
+            ],
+            "vo": "Chalo, ek 5 saal ke bachche ko samjhate hain hum kya karte hain. Hum internet pe ghar banate hain. Un gharon mein dukaanein rehti hain. Log ghoomne aate hain. Agar ghar slow hai… log bagal wale ghar chale jaate hain. Agar ghar fast aur sundar hai… sab aate hain. Bas, yahi hai humara kaam. Happy Children's Day!",
+            "audio": "Playful xylophone or ukulele trending audio, toy squeaks and pops.",
+            "caption": "Explaining what we do to a 5-year-old 🧸\n\n\"We build houses on the internet. Shops live inside them. When the house is fast and pretty, lots of people visit. When it's slow, they go next door.\"\n\nHonestly? That's the whole job. 😄\n\nNo jargon. Just websites that bring people in.\n\nHappy Children's Day from team StackShooter! 🎈\n\n💬 How would YOU explain your job to a kid? Tell us below.\n➕ Follow @stackshooterofficial for tech, made simple.",
+            "tags": "#ChildrensDay #ExplainLikeImFive #3DAnimation #WebDevelopment #StackShooter",
+            "tags2": "#TechMadeSimple #MotionGraphics",
+            "cta": "Comment your version",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "8:30 PM",
+              "fb": "8:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 15,
+            "pillar": "Engagement",
+            "style": "Kinetic typography + 3D motion",
+            "series": "",
+            "title": "Myth: a website is a one-time expense",
+            "hl": "one-time expense",
+            "hooks": [
+              "The most expensive website myth in India 👇",
+              "\"Website ek baar banwa lo, bas.\" Wrong.",
+              "This one belief is quietly killing your website."
+            ],
+            "problem": "Owners treat a website as a one-time expense: no updates, backups or SEO, so it gets slow, drops on Google and gets hacked.",
+            "solution": "Ongoing maintenance and growth support: security updates, backups, speed checks, SEO and fresh content.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Bold kinetic text card; a big red 3D stamp slams down reading MYTH",
+                "txt": "MYTH: A website is a one-time expense."
+              },
+              {
+                "t": "3–8s",
+                "v": "3D shop with dusty shutters and cobwebs on a browser window; a padlock creaks open by itself",
+                "txt": "No updates. No backups. No security."
+              },
+              {
+                "t": "8–12s",
+                "v": "Motion graph: a ranking line drops; a red 'Hacked' warning flashes",
+                "txt": "Slower. Lower on Google. Easy to hack."
+              },
+              {
+                "t": "12–18s",
+                "v": "Blue 3D stamp FACT; a robotic arm polishes the window, installs a glowing shield and uploads to a cloud",
+                "txt": "FACT: A website is a shop. It needs care."
+              },
+              {
+                "t": "18–23s",
+                "v": "Four icon cards flip in: shield, speedometer, magnifier, pen",
+                "txt": "Security · Speed · SEO · Fresh content"
+              },
+              {
+                "t": "23–26s",
+                "v": "End card",
+                "txt": "Comment another myth. We'll bust it."
+              }
+            ],
+            "vo": "Sabse mehenga website myth: 'Website ek baar banwa lo, bas.' Galat. Bina updates, backups aur security ke website slow hoti hai, Google pe neeche jaati hai, aur hack hone ka khatra badhta hai. Website ek dukaan jaisi hai — saaf-safai, security aur naya stock chahiye. StackShooter launch ke baad bhi saath rehta hai. Aapne kaunsa myth suna hai? Comment karo, hum bust karenge.",
+            "audio": "Heavy stamp thuds on MYTH/FACT, glitch SFX on 'Hacked', confident beat.",
+            "caption": "\"Website ek baar banwa lo, bas. Khatam.\" 🙅\n\nPicture a shop that opened three years ago and has never been cleaned, restocked or properly locked since. Would you walk in?\n\nThat's what most \"one-time\" websites look like today: slow, outdated, sliding down Google and easy to hack.\n\nMYTH ❌ A website is a one-time expense.\nFACT ✅ A website is a business asset that needs care:\n🔐 Security updates & backups\n⚡ Speed checks as content grows\n🔍 SEO so it keeps ranking\n✍️ Fresh content & offers\n\nThat's why we stay with you after launch with maintenance and support.\n\n💬 What's another website myth you've heard? Comment it and we'll bust it in a reel.\n➕ Follow so you don't miss it.",
+            "tags": "#MythVsFact #WebsiteMaintenance #WebsiteTips #SmallBusinessIndia #StackShooter",
+            "tags2": "#WebSecurity #WebDevelopment",
+            "cta": "Comment a myth",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "12:30 PM",
+              "fb": "12:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 16,
+            "pillar": "Services",
+            "title": "Still running your business on Excel and WhatsApp?",
+            "hl": "Excel and WhatsApp?",
+            "problem": "Businesses run on scattered Excel sheets and WhatsApp groups: lost leads, version chaos, no live view of sales, paper attendance.",
+            "solution": "A custom CRM/ERP built around how the business works: leads, billing, inventory, HR, reports, mobile access.",
+            "slides": [
+              {
+                "copy": "Still running your business on Excel + WhatsApp?\n4 signs you've outgrown it",
+                "prompt": "A chaotic pile of spreadsheet panels and chat bubbles tangled together"
+              },
+              {
+                "copy": "Sign 1: Leads get lost in chats",
+                "prompt": "Chat bubbles falling through a hole in a glowing floor grid"
+              },
+              {
+                "copy": "Sign 2: Five versions of the same sheet",
+                "prompt": "Five overlapping spreadsheet panels slightly offset, each with a different coloured tab"
+              },
+              {
+                "copy": "Sign 3: You can't see today's sales without a phone call",
+                "prompt": "A phone with a question mark next to an empty dashboard frame"
+              },
+              {
+                "copy": "Sign 4: Tasks & attendance on paper",
+                "prompt": "A clipboard stacked with paper sheets and a pen"
+              },
+              {
+                "copy": "The fix: one custom CRM / ERP\nBuilt around how YOU work",
+                "prompt": "A sleek dashboard tablet pulling streams of chat bubbles and spreadsheets into neat cards"
+              },
+              {
+                "copy": "What it can include\nLeads · Billing · Inventory · HR & attendance · Reports · Mobile access",
+                "prompt": "Six modular glass blocks with simple icons (person, invoice, box, calendar, chart, phone) snapping into a grid"
+              },
+              {
+                "copy": "Free consultation → DM \"CRM\"\nFollow @stackshooterofficial",
+                "prompt": "A glowing chat bubble with a gear icon inside"
+              }
+            ],
+            "caption": "Picture this: it's 7 PM. You want to know today's sales. So you call the accountant, who checks a sheet… which turns out to be the old version, because the new one is on someone's phone. 📊\n\nIf your business runs on Excel sheets and WhatsApp groups, you're not alone. But it's costing you leads, time and sleep.\n\nSigns you've outgrown it:\n→ Leads lost in chats\n→ Five versions of the same sheet\n→ No live view of sales\n→ Tasks & attendance on paper\n\nA custom CRM or ERP puts leads, billing, inventory, staff and reports in one place, on your phone and laptop, built around how YOUR business works.\n\n👉 DM \"CRM\" for a free consultation.\n➕ Follow for more ways to automate your business.",
+            "tags": "#CRM #ERP #BusinessAutomation #MSME #StackShooter",
+            "tags2": "#CustomSoftware #SmallBusinessIndia",
+            "cta": "DM CRM",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 17,
+            "pillar": "Speed",
+            "style": "Faceless UGC (screen recording) + 3D motion",
+            "series": "Website Doctor · Ep 3",
+            "title": "We speed-tested a website live",
+            "hl": "live",
+            "hooks": [
+              "We speed-tested a website live. The score was painful.",
+              "Run this free test on your website tonight. 👇",
+              "Red score = lost customers. Let's fix one, live."
+            ],
+            "problem": "Owners don't know their website's speed score or what's slowing it down.",
+            "solution": "Free speed & architecture audit, then optimisation: image compression, plugin clean-up, caching, better hosting.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Screen recording: Google PageSpeed Insights, typing the URL of your own demo site (or a client's, with permission) and pressing Analyze",
+                "txt": "Live speed test. Let's go."
+              },
+              {
+                "t": "3–6s",
+                "v": "The score counts up and stops in red; a 3D red siren light spins in the corner",
+                "txt": "Red zone. 🚨"
+              },
+              {
+                "t": "6–12s",
+                "v": "Zoom into the Opportunities list; each item gets a 3D icon: a giant image file, a pile of plugin boxes, an empty cache drawer, a tired server",
+                "txt": "Huge images · Too many plugins · No caching · Slow hosting"
+              },
+              {
+                "t": "12–18s",
+                "v": "3D fixes one by one: images squish smaller, plugin boxes vanish, the server gets a turbo boost",
+                "txt": "Fix · Fix · Fix · Fix"
+              },
+              {
+                "t": "18–22s",
+                "v": "Screen recording: re-run the test; the score climbs into green; confetti",
+                "txt": "Green. ✅"
+              },
+              {
+                "t": "22–26s",
+                "v": "End card with the 'Website Doctor' badge",
+                "txt": "Want yours tested? Comment \"SPEED\""
+              }
+            ],
+            "vo": "Chalo, ek website ka live speed test karte hain. Analyze… aur score — red zone. Problem kya hai? Badi-badi images, bahut saare plugins, caching nahi, aur slow hosting. Ab fix karte hain. Images compress, faltu plugins hatao, caching on, achhi hosting. Dobara test… green! Aapki website ka score kya hai? Comment karo 'SPEED', hum check karenge.",
+            "audio": "Siren SFX on the red score, satisfying 'pop' on each fix, triumphant hit on green.",
+            "caption": "Picture this: you spent good money on a beautiful website. Then you run one free test… and the score is red. 🚨\n\nThat's what happened when we tested this site live. The culprits are almost always the same:\n🐢 Huge, uncompressed images\n🐢 Too many plugins & scripts\n🐢 No caching\n🐢 Slow, overloaded hosting\n\nFix those four and the same site can load several times faster, which means better Google rankings and more enquiries.\n\n👉 Comment \"SPEED\" and we'll test your website for free.\n➕ Follow for Website Doctor every Tuesday.",
+            "tags": "#PageSpeed #WebsiteSpeed #WebsiteAudit #SmallBusinessIndia #StackShooter",
+            "tags2": "#CoreWebVitals #SEO",
+            "cta": "Comment SPEED",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 18,
+            "pillar": "Process",
+            "title": "What happens after you send us a brief",
+            "hl": "send us a brief",
+            "problem": "Agencies go silent after the first message, send vague quotes and give no visibility.",
+            "solution": "A transparent 5-step process: reply within 2 hours, roadmap & clear quote, phased build with updates, launch and support.",
+            "slides": [
+              {
+                "copy": "What happens after you send us a brief\n1 Brief or 15-min call\n2 Reply within 2 hours\n3 Roadmap & clear quote\n4 Phased build + updates\n5 Launch & support",
+                "prompt": "A vertical path of five glowing glass stepping stones rising upward to a small rocket, empty space on the left"
+              }
+            ],
+            "caption": "Picture this: you message an agency about a project. Three days pass. Then a vague quote. Then silence. 😶\n\nWe've heard that story too many times, so here's exactly what happens when you reach out to us:\n\n1️⃣ Send a brief or book a 15-minute discovery call\n2️⃣ We reply within 2 hours (on average)\n3️⃣ You get a custom roadmap and a clear quote\n4️⃣ We build in phases and update you at every step\n5️⃣ We handle domain, hosting and deployment, then support you after launch\n\nNo middlemen. You talk directly to the engineers building your product.\n\n👉 Ready when you are: stackshooter.com\n➕ Follow to see how we build.",
+            "tags": "#HowWeWork #WebDevelopment #SoftwareDevelopment #StartupIndia #StackShooter",
+            "tags2": "#ClientExperience #Transparency",
+            "cta": "Visit stackshooter.com",
+            "fmt": "Caption",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 19,
+            "pillar": "Industry",
+            "style": "3D motion graphics + UGC screen",
+            "series": "Industry Fix · Ep 3",
+            "title": "Your clinic needs a 24/7 receptionist",
+            "hl": "24/7 receptionist",
+            "hooks": [
+              "A patient called your clinic at 9 PM. Nobody picked up. They booked somewhere else.",
+              "Doctors: your reception closes at 8. Your website shouldn't.",
+              "Your clinic is losing patients while you sleep. 🩺"
+            ],
+            "problem": "Clinics lose patients to missed calls, phone-only booking and no-shows.",
+            "solution": "A clinic website with 24/7 online appointments, WhatsApp/SMS reminders, doctor profiles and Google Maps visibility.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "3D clinic reception desk at night, lights off; a phone on the desk rings with a glowing ring, unanswered",
+                "txt": "9 PM. Patient calls. No one answers."
+              },
+              {
+                "t": "3–6s",
+                "v": "Phone UI animation: a missed-call notification, then a demo booking page of another clinic opens",
+                "txt": "They book somewhere else."
+              },
+              {
+                "t": "6–13s",
+                "v": "A glass browser window lights up on the same desk: doctor cards, a calendar with time slots, one slot gets selected",
+                "txt": "24/7 online appointments"
+              },
+              {
+                "t": "13–18s",
+                "v": "Confirmation tick → WhatsApp reminder bubble ('Your appointment tomorrow 10 AM') → bell rings",
+                "txt": "Auto reminders = fewer no-shows"
+              },
+              {
+                "t": "18–22s",
+                "v": "A 3D map pin with a medical cross rises over a city map",
+                "txt": "Found on Google for \"clinic near me\""
+              },
+              {
+                "t": "22–26s",
+                "v": "End card",
+                "txt": "Clinics · Hospitals · Labs · Dentists → DM \"CLINIC\""
+              }
+            ],
+            "vo": "Raat ke 9 baje ek patient ne aapke clinic ko call kiya. Kisi ne phone nahi uthaya. Usne dusre clinic mein book kar liya. Agar aapki website 24 ghante appointment le sakti… toh? Doctor profiles, time slots, online booking, aur WhatsApp reminders — taaki no-shows kam ho. Plus Google Maps pe 'clinic near me' mein dikho. Demo dekhna hai? DM karo 'CLINIC'.",
+            "audio": "Phone ring echo in an empty room, soft heartbeat-style pulse, calm reassuring track after 6s.",
+            "caption": "Picture this: it's 9 PM. A mother wants to book her child's check-up for tomorrow. 🩺\n\nShe calls your clinic. Reception is closed. No answer.\n\nShe books with the clinic that has an online booking page instead.\n\nYour reception closes. Your website doesn't have to.\n✅ 24/7 online appointment booking\n✅ Automatic WhatsApp / SMS reminders\n✅ Doctor profiles & services that build trust\n✅ Found on Google for \"clinic near me\"\n\nFewer missed calls. Fewer no-shows. More booked slots.\n\n👉 DM \"CLINIC\" to see a demo.\n➕ Follow for Industry Fix every Thursday.",
+            "tags": "#HealthcareMarketing #ClinicWebsite #DoctorsOfIndia #AppointmentBooking #StackShooter",
+            "tags2": "#HealthcareIndia #LocalSEO",
+            "cta": "DM CLINIC",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 20,
+            "pillar": "Tips",
+            "title": "Local SEO in 6 steps: get found in your city",
+            "hl": "your city",
+            "problem": "Local businesses don't show up when nearby customers search, so walk-ins go to competitors.",
+            "solution": "Local SEO: Google Business Profile, consistent listings, city keywords, reviews, directories and regular updates.",
+            "slides": [
+              {
+                "copy": "Local SEO in 6 steps\nGet found first in your city",
+                "prompt": "A city map grid at night with one tall glowing map pin rising above the rest"
+              },
+              {
+                "copy": "1. Claim & complete your Google Business Profile",
+                "prompt": "A storefront card with a verified badge"
+              },
+              {
+                "copy": "2. Same name, address & phone everywhere",
+                "prompt": "Three identical ID cards aligned perfectly, connected by a beam of light"
+              },
+              {
+                "copy": "3. City + service keywords on your website",
+                "prompt": "A search bar with a location pin and glowing keyword chips"
+              },
+              {
+                "copy": "4. Collect reviews & reply to every one",
+                "prompt": "Stars floating up from a smartphone next to a speech bubble"
+              },
+              {
+                "copy": "5. List on trusted local directories",
+                "prompt": "Stacked directory cards with a map pin on top"
+              },
+              {
+                "copy": "6. Post photos & updates every week",
+                "prompt": "A camera and a calendar with a weekly repeat arrow"
+              },
+              {
+                "copy": "Want us to handle it?\nDM \"LOCAL\" · Save this 📌",
+                "prompt": "A map pin with a rising arrow and sparkles"
+              }
+            ],
+            "caption": "Picture two cafés on the same street. Same coffee, same prices. ☕ One is packed every evening. The other is half empty.\n\nThe difference? When people nearby search \"café near me\", only one of them shows up.\n\nLocal SEO decides who gets the walk-ins:\n1. Complete your Google Business Profile\n2. Same name, address & phone everywhere\n3. City + service keywords on your website\n4. Collect reviews and reply to every one\n5. List on trusted local directories\n6. Post photos & updates every week\n\n💾 Save this and do one step a day.\n👉 Or DM \"LOCAL\" and we'll handle it for you.\n➕ Follow for more growth tips.",
+            "tags": "#LocalSEO #GoogleBusinessProfile #SEOTips #SmallBusinessIndia #StackShooter",
+            "tags2": "#LocalBusiness #DigitalMarketing",
+            "cta": "Save + DM LOCAL",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 21,
+            "pillar": "Services",
+            "style": "3D motion graphics",
+            "series": "",
+            "title": "Your Instagram page is not your store",
+            "hl": "not your store",
+            "hooks": [
+              "Running your business only on Instagram? One ban and it's all gone.",
+              "Your followers aren't yours. Your website is.",
+              "Social media is rented land. Here's why that's dangerous."
+            ],
+            "problem": "Many small businesses sell only through social media DMs: no ownership, no checkout, no Google presence, and one hack or ban wipes everything.",
+            "solution": "An own website / online store with catalogue, cart, payments and SEO; social media drives traffic to it.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "3D smartphone showing a generic social profile grid (no real app branding) with a small shop built on top of the phone",
+                "txt": "Your whole business… on one app?"
+              },
+              {
+                "t": "3–7s",
+                "v": "The screen glitches; a generic 'Account restricted' banner flashes; the shop crumbles into sand",
+                "txt": "One hack. One ban. Gone."
+              },
+              {
+                "t": "7–12s",
+                "v": "Chat bubbles pile up and overflow the screen: 'price?', 'available?', 'COD?'",
+                "txt": "Plus 100 \"price?\" DMs a day"
+              },
+              {
+                "t": "12–18s",
+                "v": "A solid glass storefront rises on its own plot labelled yourbrand.com: product cards, cart, checkout button",
+                "txt": "Own your store. Own your customers."
+              },
+              {
+                "t": "18–23s",
+                "v": "Generic hearts and share arrows stream glowing dots (people) into the storefront",
+                "txt": "Social brings traffic. Your website closes the sale."
+              },
+              {
+                "t": "23–26s",
+                "v": "End card",
+                "txt": "Get your own store → DM \"STORE\""
+              }
+            ],
+            "vo": "Poora business sirf ek app pe? Ek hack, ek ban… aur sab khatam. Upar se din bhar 'price?', 'available?', 'COD hai?' wale DMs. Social media kiraye ki zameen hai. Website aapki apni zameen. Apna online store — catalogue, cart, online payment, aur Google pe ranking. Social se log lao, website pe sale karo. Apna store chahiye? DM karo 'STORE'.",
+            "audio": "Glitch SFX on the ban, sand-crumble sound, then a confident rising beat.",
+            "caption": "Picture this: three years of posts, thousands of followers, daily orders in DMs. 📱 Then one morning: \"Your account has been restricted.\"\n\nNo orders. No customer list. No way to reach anyone.\n\nIt happens more often than people think, and it's why a social page should never be your only shop.\n\nSocial media is rented land. Your website is land you own.\n✅ Your own catalogue, cart & checkout\n✅ UPI, cards & COD payments\n✅ Customers & data that belong to you\n✅ Shows up on Google, not just in feeds\n\nUse social media to bring people in. Use your website to close the sale.\n\n👉 DM \"STORE\" and we'll show you what your store could look like.\n➕ Follow for more ways to grow without the risk.",
+            "tags": "#SmallBusinessIndia #Ecommerce #OnlineStore #D2CIndia #StackShooter",
+            "tags2": "#InstagramBusiness #OwnYourPlatform",
+            "cta": "DM STORE",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "8:30 PM",
+              "fb": "8:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 22,
+            "pillar": "Engagement",
+            "style": "3D motion graphics",
+            "series": "",
+            "title": "Which website would you trust?",
+            "hl": "trust?",
+            "hooks": [
+              "You have 3 seconds. Which website do you trust? A or B?",
+              "Only one of these businesses gets your money. Which one?",
+              "Pick one. Your answer explains why your website isn't converting."
+            ],
+            "problem": "Cluttered, outdated designs kill trust; visitors judge a business within seconds.",
+            "solution": "Clean, conversion-focused UI/UX: clear headline, one action, real proof.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Two floating 3D browser windows labelled A and B for a made-up interiors brand; a big countdown '3' between them",
+                "txt": "3 seconds. Which one do you trust?"
+              },
+              {
+                "t": "3–8s",
+                "v": "Camera orbits both. A: cluttered, tiny text, flashing banners, no button. B: clean headline, big WhatsApp button, review stars strip",
+                "txt": "A or B?"
+              },
+              {
+                "t": "8–12s",
+                "v": "Countdown 2… 1… both windows freeze with a camera-shutter flash",
+                "txt": "Lock your answer 👇"
+              },
+              {
+                "t": "12–18s",
+                "v": "B glows; callout labels pop around it: clear headline, one button, proof",
+                "txt": "Clear message · One action · Real proof"
+              },
+              {
+                "t": "18–22s",
+                "v": "A dims and slides back; callout labels: clutter, no action, slow",
+                "txt": "Clutter kills trust."
+              },
+              {
+                "t": "22–25s",
+                "v": "End card",
+                "txt": "Comment A or B. Want B? DM \"DESIGN\""
+              }
+            ],
+            "vo": "Aapke paas 3 second hain. Kis website pe bharosa karoge — A ya B? Teen… do… ek. Answer lock karo, comment mein likho. Ab dekho B kyun jeetti hai: clear headline, ek hi button, aur proof. A mein sirf clutter hai. Log seconds mein decide karte hain. Aapki website A hai ya B? Agar B chahiye — DM karo 'DESIGN'.",
+            "audio": "Game-show countdown beeps, shutter click on freeze, 'ding' when B wins.",
+            "caption": "Quick test. 🤔 You need a service today. Two websites open. You have 3 seconds.\n\n🅰️ or 🅱️: which one gets your money?\n\nComment your answer BEFORE you watch the reveal. 👇\n\nPeople decide whether to trust a business within seconds of landing on its homepage. Not after reading your \"About us\". Instantly.\n\nThe winner always has three things: a clear headline, one obvious action, and real proof.\n\n👉 Is your website A or B? DM \"DESIGN\" for a free homepage review.\n➕ Follow for more design breakdowns.",
+            "tags": "#WebDesign #UXDesign #UIDesign #WebsiteDesign #StackShooter",
+            "tags2": "#ThisOrThat #ConversionRate",
+            "cta": "Comment A or B / DM DESIGN",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "12:30 PM",
+              "fb": "12:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 23,
+            "pillar": "Services",
+            "title": "Do you need an app, or just a better website?",
+            "hl": "better website?",
+            "problem": "Businesses spend heavily on apps nobody opens, while their website stays slow.",
+            "solution": "Honest advice and builds across websites, PWAs and Android/iOS apps, in the right order.",
+            "slides": [
+              {
+                "copy": "Do you need an app?\nOr just a better website?",
+                "prompt": "A smartphone and a laptop balanced on either side of a glowing scale"
+              },
+              {
+                "copy": "Get a WEBSITE first if…\n• People find you on Google\n• You need enquiries or bookings\n• Customers visit occasionally",
+                "prompt": "A glass browser window with a magnifying glass in front"
+              },
+              {
+                "copy": "Get an APP when…\n• Customers use you every week\n• You need notifications\n• You need offline use or phone features",
+                "prompt": "A smartphone with a notification bell and a GPS pin floating above"
+              },
+              {
+                "copy": "The middle path: PWA\nAn installable, app-like website at a fraction of the cost",
+                "prompt": "A browser window morphing into an app icon tile"
+              },
+              {
+                "copy": "The smart order\nWebsite first → prove usage → then app",
+                "prompt": "A three-step staircase with a laptop, a rising chart and a smartphone on each step"
+              },
+              {
+                "copy": "We build all three\nWebsites · PWAs · Android & iOS apps",
+                "prompt": "A laptop, tablet and phone arranged in a gentle arc"
+              },
+              {
+                "copy": "3-question test\n1. Will customers open it weekly?\n2. Do you need push notifications?\n3. Do you need phone hardware?\n2+ yes → app. Otherwise → website.",
+                "prompt": "A quiz card with three glowing checkboxes"
+              },
+              {
+                "copy": "Still unsure? Get an honest answer\nDM \"APP\"",
+                "prompt": "A chat bubble with a glowing lightbulb"
+              }
+            ],
+            "caption": "Picture this: a restaurant spends lakhs on an app. 📱 Six months later it has a few hundred downloads and nobody opens it. Meanwhile, their website still takes 8 seconds to load.\n\n\"Should I build an app?\" is the most common question we get. Our honest answer:\n\nWebsite first if people find you on Google and you need enquiries or bookings.\nApp when customers use you every week and need notifications, offline access or phone features.\nIn between? A PWA gives you an installable, app-like website for much less.\n\n💾 Save the 3-question test on the last slide.\n👉 DM \"APP\" and we'll give you a straight answer, even if it means a smaller project for us.\n➕ Follow for honest tech advice.",
+            "tags": "#AppDevelopment #MobileApp #WebsiteVsApp #StartupIndia #StackShooter",
+            "tags2": "#PWA #SmallBusinessIndia",
+            "cta": "DM APP",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 24,
+            "pillar": "Tips",
+            "style": "Kinetic typography + UGC screen",
+            "series": "Website Doctor · Ep 4",
+            "title": "3 homepage mistakes killing your sales",
+            "hl": "killing your sales",
+            "hooks": [
+              "3 homepage mistakes that make customers leave in 5 seconds.",
+              "Your homepage says \"Welcome\". Your customer says \"Bye\".",
+              "Fix these 3 things tonight. Get more enquiries tomorrow."
+            ],
+            "problem": "Homepages that don't say what the business does, hide the call-to-action and rely on auto-sliders.",
+            "solution": "Conversion-focused homepage redesign; free homepage review.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "Kinetic text 'Welcome to our website' gets crumpled into a 3D paper ball and tossed off screen",
+                "txt": "Mistake #1"
+              },
+              {
+                "t": "3–8s",
+                "v": "Mock homepage: the vague headline is replaced by 'Modular kitchens installed in 21 days'",
+                "txt": "Say what you do + for whom"
+              },
+              {
+                "t": "8–13s",
+                "v": "3D phone scrolls a homepage with no button; a big glowing 'WhatsApp us' button slides in on the first screen",
+                "txt": "Mistake #2: No button on screen 1"
+              },
+              {
+                "t": "13–18s",
+                "v": "Auto-sliding banners spin like a slot machine, then snap into one clean static hero",
+                "txt": "Mistake #3: Sliders nobody reads"
+              },
+              {
+                "t": "18–22s",
+                "v": "Before/after split screen; an enquiry counter icon ticks up on the 'after' side",
+                "txt": "Same traffic. More enquiries."
+              },
+              {
+                "t": "22–26s",
+                "v": "End card with the 'Website Doctor' badge",
+                "txt": "Free homepage review → Comment \"REVIEW\""
+              }
+            ],
+            "vo": "Teen homepage mistakes jo customer ko 5 second mein bhaga dete hain. Ek — 'Welcome to our website'. Customer ko batao aap kya karte ho aur kiske liye. Do — pehli screen pe koi button nahi. Call, WhatsApp ya Book — saamne hona chahiye. Teen — auto-sliding banners. Koi nahi padhta, aur website slow hoti hai. Ye teen fix karo — same traffic, zyada enquiries. Free homepage review chahiye? Comment karo 'REVIEW'.",
+            "audio": "Paper crumple, slot-machine spin and stop, then a clean 'click'. Upbeat track.",
+            "caption": "Picture this: someone lands on your homepage. They see \"Welcome to our website\", a slider spinning through five banners, and no button anywhere. 🤷\n\nFive seconds later they're gone. Not because your service is bad, but because your homepage never told them what to do.\n\nThe 3 fixes:\n1. Say what you do and for whom in the headline\n2. Put a call, WhatsApp or booking button on the first screen\n3. Replace auto-sliders with one strong message\n\nSame traffic. More enquiries.\n\n👉 Comment \"REVIEW\" and we'll review a few homepages for free.\n➕ Follow for Website Doctor every Tuesday.",
+            "tags": "#HomepageDesign #ConversionRateOptimization #WebDesign #SmallBusinessIndia #StackShooter",
+            "tags2": "#UXDesign #LandingPage",
+            "cta": "Comment REVIEW",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 25,
+            "pillar": "Offer",
+            "title": "Your free speed & architecture audit",
+            "hl": "free",
+            "problem": "Owners judge their website by looks and never get a proper technical check-up.",
+            "solution": "Free audit: speed, mobile, SEO basics, security, architecture review and a 15-minute call with an engineer.",
+            "slides": [
+              {
+                "copy": "Free website audit\n⚡ Speed · 📱 Mobile · 🔍 SEO · 🔐 Security · 🏗️ Architecture\n+ 15-min call with an engineer",
+                "prompt": "A magnifying glass hovering over a glass browser window, revealing a glowing blueprint inside, small check icons floating"
+              }
+            ],
+            "caption": "Picture going to a doctor who says \"you look fine\" without running a single test. 🩺 That's how most people judge their website.\n\nSo here's our offer: a free, proper check-up.\n\n⚡ Speed score + what's slowing it down\n📱 Mobile experience check\n🔍 SEO basics: titles, indexing, Google Maps\n🔐 Security & SSL check\n🏗️ Architecture review: will it scale with you?\n📞 A 15-minute call with an engineer to walk you through it\n\nNo sales pressure. Just a clear picture of what's working and what's costing you customers.\n\n👉 DM \"AUDIT\" or book at stackshooter.com\n➕ Follow @stackshooterofficial for weekly website fixes.",
+            "tags": "#WebsiteAudit #FreeAudit #SEOAudit #SmallBusinessIndia #StackShooter",
+            "tags2": "#WebsiteSpeed #DigitalGrowth",
+            "cta": "DM AUDIT",
+            "fmt": "Caption",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 26,
+            "pillar": "Industry",
+            "style": "3D motion graphics",
+            "series": "Industry Fix · Ep 4",
+            "title": "Your website should take admissions while you teach",
+            "hl": "take admissions",
+            "hooks": [
+              "Coaching owners: every unanswered call is an admission you just lost.",
+              "Your website should take admissions while you teach. 🎓",
+              "Admission season is coming. Is your website ready, or just your banners?"
+            ],
+            "problem": "Institutes rely on phone calls, paper forms and cash fees; enquiries get lost and parents can't find details online.",
+            "solution": "An education website with enquiry CRM, online fee payments, student login portal and online certificates.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "3D classroom with a chalkboard; on the teacher's desk a phone vibrates showing 6 missed calls",
+                "txt": "You're teaching. Admissions are calling."
+              },
+              {
+                "t": "3–7s",
+                "v": "Enquiry bubbles from search, social and WhatsApp pile up; some drift away and fade",
+                "txt": "Every missed call = a lost admission"
+              },
+              {
+                "t": "7–13s",
+                "v": "A glass browser window: course cards, batch timings and an 'Enquire now' form; the submitted form flies into a CRM list",
+                "txt": "Courses · Batches · Enquiry form → CRM"
+              },
+              {
+                "t": "13–18s",
+                "v": "UPI/card payment tick and receipt; a student login screen with study-material folders",
+                "txt": "Online fees · Student portal"
+              },
+              {
+                "t": "18–22s",
+                "v": "Certificates fly out with a verification QR code",
+                "txt": "Results & certificates online"
+              },
+              {
+                "t": "22–26s",
+                "v": "End card",
+                "txt": "Schools · Coaching · Online educators → DM \"ADMISSION\""
+              }
+            ],
+            "vo": "Aap class mein padha rahe ho… aur phone pe 6 missed calls. Har missed call ek lost admission hai. Ab socho — website khud admissions sambhale. Courses, batch timings, enquiry form jo seedha CRM mein jaaye. Online fee payment, student login, study material, aur certificates online. Aap padhao, website sambhalegi. DM karo 'ADMISSION'.",
+            "audio": "School-bell SFX at the start, phone buzz, then an inspiring light track.",
+            "caption": "Picture this: you're in the middle of a class. 📚 Your phone buzzes. Then again. Six missed calls by the time the bell rings.\n\nBy evening, some of those parents have enrolled their kids somewhere else, somewhere that answered.\n\nYour website can be your admissions office:\n✅ Course & batch pages that rank on Google\n✅ Enquiry forms that land straight in a CRM\n✅ Online fee payments\n✅ Student login & study material portal\n✅ Certificates & results online\n\nYou teach. Your website handles the rest.\n\n👉 DM \"ADMISSION\" to see how it works.\n➕ Follow for Industry Fix every Thursday.",
+            "tags": "#EducationIndia #CoachingInstitute #EdTech #SchoolWebsite #StackShooter",
+            "tags2": "#StudentPortal #AdmissionsOpen",
+            "cta": "DM ADMISSION",
+            "fmt": "Reel",
+            "slides": [],
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 27,
+            "pillar": "Tips",
+            "title": "Is your online store ready for sale season?",
+            "hl": "sale season?",
+            "problem": "Stores crash or convert poorly when sale traffic spikes: slow pages, long checkout, missing payment options.",
+            "solution": "Sale-readiness check and e-commerce optimisation: performance under load, checkout, payments, courier, cart recovery.",
+            "slides": [
+              {
+                "copy": "Black Friday is here.\nIs your online store ready?",
+                "prompt": "A shopping cart racing forward with speed lines and floating blank sale tags"
+              },
+              {
+                "copy": "Can it handle 10× traffic?",
+                "prompt": "A server rack with a pressure gauge, a stream of glowing dots pouring in"
+              },
+              {
+                "copy": "Checkout in a few taps on mobile",
+                "prompt": "A smartphone with a short glowing three-step path ending in a checkmark"
+              },
+              {
+                "copy": "UPI · Cards · COD · International",
+                "prompt": "A payment card, a QR-code tile and a cash note floating together"
+              },
+              {
+                "copy": "Courier & shipping integrated",
+                "prompt": "A delivery box on a conveyor with a route line across a map"
+              },
+              {
+                "copy": "Abandoned-cart reminders on",
+                "prompt": "A shopping cart with a notification bell and a curved return arrow"
+              },
+              {
+                "copy": "Fast product pages & compressed images",
+                "prompt": "An image file being pressed smaller by a glass press, speed lines"
+              },
+              {
+                "copy": "Offer banners that don't slow the site",
+                "prompt": "A light ribbon banner floating above a speedometer in the green zone"
+              },
+              {
+                "copy": "Get sale-ready in days → DM \"STORE\"",
+                "prompt": "A gift box opening with blue light rays"
+              }
+            ],
+            "caption": "Picture this: your biggest sale of the year goes live. 🛍️ Traffic spikes. Orders start coming in. Then the site freezes at checkout.\n\nCustomers don't wait. They buy from the next store in their feed.\n\nBefore the sale season peaks, check:\n✅ Can it handle 10× visitors?\n✅ Checkout in a few taps on mobile\n✅ UPI, cards, COD & international payments\n✅ Courier & shipping integrated\n✅ Abandoned-cart reminders on\n✅ Fast product pages\n\n💾 Save this checklist.\n👉 DM \"STORE\" for a quick sale-readiness check.\n➕ Follow for more e-commerce tips.",
+            "tags": "#BlackFriday #Ecommerce #EcommerceIndia #OnlineStore #StackShooter",
+            "tags2": "#D2CIndia #SaleSeason",
+            "cta": "DM STORE",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 28,
+            "pillar": "Showcase",
+            "style": "3D motion graphics",
+            "series": "",
+            "title": "Website makeover: before vs after",
+            "hl": "before vs after",
+            "hooks": [
+              "Watch an outdated website turn into a lead machine. ✨",
+              "Same business. New website. Spot the difference.",
+              "Before you redesign your website, watch this."
+            ],
+            "problem": "Outdated websites (cluttered, slow, not mobile-friendly) quietly hurt credibility.",
+            "solution": "A redesign with a clear message, one call-to-action, fast code, mobile-first layout and SEO built in.",
+            "scenes": [
+              {
+                "t": "0–3s",
+                "v": "A 3D retro monitor showing a cluttered, pixelated concept website (made-up business, labelled Concept)",
+                "txt": "Before 😬 (concept)"
+              },
+              {
+                "t": "3–6s",
+                "v": "The monitor shakes and its glass shatters into thousands of blue particles",
+                "txt": ""
+              },
+              {
+                "t": "6–12s",
+                "v": "Particles reassemble into a sleek floating laptop and phone showing a clean, modern redesign",
+                "txt": "After ✨"
+              },
+              {
+                "t": "12–18s",
+                "v": "Callout labels orbit the devices: clear headline, one CTA, mobile-first, fast code, SEO-ready",
+                "txt": "What changed"
+              },
+              {
+                "t": "18–22s",
+                "v": "A speedometer moves from red to green; an enquiry counter ticks up",
+                "txt": "Faster. Clearer. More enquiries."
+              },
+              {
+                "t": "22–26s",
+                "v": "End card",
+                "txt": "Want a glow-up? DM \"MAKEOVER\""
+              }
+            ],
+            "vo": "Pehle… ye. Purana, cluttered, slow. Ab… dekho. Clear headline. Ek strong button. Mobile-first design. Halka, fast code. Aur Google ke liye ready. Same business, bas website ab utni mehnat karti hai jitni aap. Aapki website ko glow-up chahiye? DM karo 'MAKEOVER'.",
+            "audio": "Trending 'glow-up' transition audio; glass-shatter SFX synced to the beat drop.",
+            "caption": "Picture this: your business has grown for eight years. Your website… still looks like it did on day one. 😬\n\nCustomers notice. Before they call, they Google you, and an outdated site quietly says \"maybe not\".\n\nSo we gave this concept site a glow-up. ✨\n→ A clear headline that says what the business does\n→ One strong call-to-action\n→ Lighter code, much faster load\n→ Designed mobile-first\n→ Built for Google from day one\n\nSame business. A website that finally works as hard as you do.\n\n👉 DM \"MAKEOVER\" for a free redesign consultation.\n➕ Follow to see more transformations.",
+            "tags": "#WebsiteRedesign #BeforeAndAfter #WebDesign #3DAnimation #StackShooter",
+            "tags2": "#UIDesign #SmallBusinessIndia",
+            "cta": "DM MAKEOVER",
+            "fmt": "Reel",
+            "slides": [],
+            "times": {
+              "ig": "8:30 PM",
+              "fb": "8:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 29,
+            "pillar": "Engagement",
+            "title": "Ask us anything about your website",
+            "hl": "anything",
+            "problem": "Owners have tech questions but don't know who to ask without a sales pitch.",
+            "solution": "Open Q&A; best questions become reels (content ideas from real audience pain points).",
+            "slides": [
+              {
+                "copy": "Ask us anything\nWebsites · Stores · Apps · Software · SEO · Costs",
+                "prompt": "A glowing question mark made of small blue glass cubes floating above a chat bubble"
+              }
+            ],
+            "caption": "It's Sunday, so let's make it an open house. 🙌\n\nPicture having a senior engineer on call for a day. No charge, no sales pitch. What would you ask?\n\n💻 Websites & online stores\n📱 Apps & custom software\n🔍 SEO & getting found on Google\n💰 What things actually cost\n\nDrop your question in the comments. We'll answer every one this week, and the best questions become reels. 🎬\n\n➕ Follow so you see your answer.",
+            "tags": "#AskMeAnything #WebDevelopment #SmallBusinessIndia #TechHelp #StackShooter",
+            "tags2": "#AppDevelopment #SEO",
+            "cta": "Ask in the comments",
+            "fmt": "Caption",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": {
+              "ig": "12:30 PM",
+              "fb": "12:30 PM",
+              "li": "Skip (weekend)"
+            },
+            "status": "Idea",
+            "img": null
+          },
+          {
+            "d": 30,
+            "pillar": "Offer",
+            "title": "30 days, 30 lessons: our November recap",
+            "hl": "November recap",
+            "problem": "New followers missed the month's most useful lessons.",
+            "solution": "A save-worthy recap plus an invitation to book December projects with a free audit.",
+            "slides": [
+              {
+                "copy": "30 days. 30 posts.\nThe 5 lessons that matter most",
+                "prompt": "A calendar page flipping, made of 30 small glowing tiles"
+              },
+              {
+                "copy": "⚡ You get about 3 seconds to impress",
+                "prompt": "A stopwatch with a blue glow"
+              },
+              {
+                "copy": "📍 Google Maps can beat paid ads for local businesses",
+                "prompt": "A map pin with a radiant halo"
+              },
+              {
+                "copy": "🔌 More plugins ≠ more features",
+                "prompt": "A messy pile of small blocks next to one sleek single block"
+              },
+              {
+                "copy": "🏠 Your homepage has one job: the next step",
+                "prompt": "A house-shaped browser window with one glowing button"
+              },
+              {
+                "copy": "📱 Website first. App when usage proves it.",
+                "prompt": "A laptop and a phone on ascending steps"
+              },
+              {
+                "copy": "Thank you for following along 🙏",
+                "prompt": "A heart made of small glowing blue cubes"
+              },
+              {
+                "copy": "Booking December projects now\nDM \"AUDIT\" · Follow for December's series",
+                "prompt": "Three stacked slanted glowing bars beside a calendar page"
+              }
+            ],
+            "caption": "30 days ago we launched StackShooter with one promise: help businesses stop losing customers online. 🙏\n\nHere's what we hope you took away:\n⚡ Your website gets about 3 seconds to impress\n📍 Google Maps can beat paid ads for local businesses\n🔌 More plugins ≠ more features\n🏠 Your homepage has one job: the next step\n📱 Website first, app when usage proves it\n\nThank you to everyone who followed, commented, saved and DM'd us this month.\n\n👉 We're booking December projects now. DM \"AUDIT\" to start with a free speed & architecture audit.\n➕ Follow for December: more Website Doctor and Industry Fix episodes.",
+            "tags": "#StackShooter #WebDevelopment #SmallBusinessIndia #WebsiteTips #StartupIndia",
+            "tags2": "#DigitalGrowth #MonthlyRecap",
+            "cta": "DM AUDIT",
+            "fmt": "Carousel",
+            "series": "",
+            "hooks": [],
+            "style": "",
+            "scenes": [],
+            "vo": "",
+            "audio": "",
+            "times": { "ig": "7:30 PM", "fb": "7:30 PM", "li": "10:30 AM" },
+            "status": "Idea",
+            "img": null
+          }
+        ]
+      }
+    </script>
+    <script id="app-js">
+      (function () {
+        "use strict";
+        var HEAD =
+          '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>StackShooter Content Calendar</title>\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">\n';
+        var SC = "<" + "/script>";
+        var LS_KEY = "ss-cal-state-v2";
+        var embedded = JSON.parse(document.getElementById("state").textContent);
+        var S = embedded,
+          localOnly = false;
+        try {
+          var ls = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+          if (ls && ls.savedAt > (embedded.savedAt || 0)) {
+            S = ls;
+            localOnly = true;
+          }
+        } catch (e) {}
+
+        var FMT = {
+          Reel: {
+            label: "Reel",
+            plural: "Reels",
+            color: "#FF6B81",
+            size: [1080, 1920],
+            tips: [
+              "<b>Instagram:</b> 9:16 Reel, 1080×1920 cover (download it from this panel), share to Feed and to your Story.",
+              "<b>Facebook:</b> cross-post as a Facebook Reel at the same time.",
+              "<b>LinkedIn:</b> native video with burned-in subtitles; most people watch muted. Weekdays only.",
+            ],
+          },
+          Carousel: {
+            label: "Carousel",
+            plural: "Carousels",
+            color: "#5B8CFF",
+            size: [1080, 1350],
+            tips: [
+              "<b>Instagram:</b> 1080×1350 slides; slide 1 is the hook.",
+              "<b>LinkedIn:</b> export the slides as one PDF and post it as a Document; it gets more reach than images.",
+              "<b>Facebook:</b> multi-image post in the same order.",
+            ],
+          },
+          Caption: {
+            label: "Caption post",
+            plural: "Caption posts",
+            color: "#F2B64C",
+            size: [1080, 1350],
+            tips: [
+              '<b>LinkedIn:</b> post text-first with the image; the first 2 lines must hook before "see more".',
+              "<b>Instagram:</b> single 1080×1350 image with the full caption.",
+              "<b>Facebook:</b> image + caption; repeat the question in the first comment.",
+            ],
+          },
+        };
+        var STATUSES = [
+          ["Idea", "var(--idea)", "#8A94A3"],
+          ["Drafting", "var(--drafting)", "#C99BFF"],
+          ["Ready", "var(--ready)", "#5FD0E8"],
+          ["Posted", "var(--posted)", "#3FCB84"],
+        ];
+        var PILLARS = [
+          "Launch",
+          "Services",
+          "Speed",
+          "Industry",
+          "Process",
+          "Tips",
+          "Engagement",
+          "Trends",
+          "Showcase",
+          "Offer",
+        ];
+        var PILLAR_LABEL = {
+          Launch: "Launch",
+          Services: "Our services",
+          Speed: "Speed & performance",
+          Industry: "Industry fix",
+          Process: "How we work",
+          Tips: "Quick tips",
+          Engagement: "Let’s talk",
+          Trends: "Trending",
+          Showcase: "Showcase",
+          Offer: "Free offer",
+        };
+        var WEEKS = [
+          {
+            from: 1,
+            to: 7,
+            name: "Week 1 · Launch & what we do",
+            sub: "Announce StackShooter, show every service, start the Website Doctor and Industry Fix series.",
+          },
+          {
+            from: 8,
+            to: 14,
+            name: "Week 2 · Get found, get booked",
+            sub: "Google Maps, online stores and direct bookings. Ends with a 3D toy reel for Children’s Day.",
+          },
+          {
+            from: 15,
+            to: 21,
+            name: "Week 3 · Systems that save time",
+            sub: "Myths, CRM/ERP, live speed tests, clinics, and why a social page isn’t a store.",
+          },
+          {
+            from: 22,
+            to: 28,
+            name: "Week 4 · Turn visitors into clients",
+            sub: "A-or-B design test, homepage fixes, the free audit, Black Friday and a makeover reel.",
+          },
+          {
+            from: 29,
+            to: 30,
+            name: "Week 5 · Wrap-up & December",
+            sub: "Ask-us-anything, then a recap that opens December bookings.",
+          },
+        ];
+        var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var MON = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        var narrow = window.matchMedia("(max-width: 720px)");
+        var view = narrow.matches ? "list" : "calendar";
+        try {
+          view = sessionStorage.getItem("ss-view") || view;
+        } catch (e) {}
+        var filter = "all";
+        var caps = {
+          artifact: null,
+          assets: null,
+          downloads: null,
+          ready: false,
+          readonly: false,
+        };
+        var app = document.getElementById("app");
+
+        function esc(s) {
+          return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c];
+          });
+        }
+        function dateOf(d) {
+          var y = S.year || 2026,
+            m = S.month == null ? 10 : S.month;
+          return new Date(y, m, d);
+        }
+        function dateLabel(d) {
+          var t = dateOf(d);
+          return DOW[t.getDay()] + ", " + t.getDate() + " " + MON[t.getMonth()];
+        }
+        function post(d) {
+          for (var i = 0; i < S.posts.length; i++)
+            if (S.posts[i].d === d) return S.posts[i];
+          return null;
+        }
+        function statusColor(s) {
+          for (var i = 0; i < STATUSES.length; i++)
+            if (STATUSES[i][0] === s) return STATUSES[i][1];
+          return "var(--idea)";
+        }
+        function imgSrc(p) {
+          if (!p.img) return null;
+          if (p.img.id) return "/_blob/" + p.img.id;
+          return p.img.data || null;
+        }
+        function shown(p) {
+          return filter === "all" || p.fmt === filter;
+        }
+        function tagCount(t) {
+          return (String(t || "").match(/#[^\s#]+/g) || []).length;
+        }
+        function timesLine(p) {
+          var t = p.times || {};
+          return (
+            "IG " +
+            (t.ig || "–") +
+            " · FB " +
+            (t.fb || "–") +
+            " · LinkedIn " +
+            (t.li || "–")
+          );
+        }
+        function promptOf(text, kind) {
+          var t = String(text || "").trim();
+          if (!t) return "";
+          if (!/[.!?]$/.test(t)) t += ".";
+          return (
+            t +
+            " Style: " +
+            (S.style || "") +
+            (kind === "reel"
+              ? ". Vertical 9:16 (1080×1920), smooth cinematic camera move."
+              : ". Vertical 4:5 (1080×1350).")
+          );
+        }
+
+        /* ---------- graphic generator (canvas) ---------- */
+        function rr(ctx, x, y, w, h, r) {
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.arcTo(x + w, y, x + w, y + h, r);
+          ctx.arcTo(x + w, y + h, x, y + h, r);
+          ctx.arcTo(x, y + h, x, y, r);
+          ctx.arcTo(x, y, x + w, y, r);
+          ctx.closePath();
+        }
+        function drawMark(ctx, x, y, s) {
+          var u = s / 64;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.fillStyle = "#3D7BFF";
+          ctx.beginPath();
+          ctx.moveTo(14 * u, 4 * u);
+          ctx.lineTo(58 * u, 4 * u);
+          ctx.lineTo(50 * u, 22 * u);
+          ctx.lineTo(6 * u, 22 * u);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = "#86ADFF";
+          ctx.beginPath();
+          ctx.moveTo(10 * u, 23 * u);
+          ctx.lineTo(54 * u, 23 * u);
+          ctx.lineTo(46 * u, 41 * u);
+          ctx.lineTo(2 * u, 41 * u);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = "#2456D6";
+          ctx.beginPath();
+          ctx.moveTo(14 * u, 42 * u);
+          ctx.lineTo(58 * u, 42 * u);
+          ctx.lineTo(50 * u, 60 * u);
+          ctx.lineTo(6 * u, 60 * u);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+        function words(title, hl) {
+          var t = String(title || ""),
+            out = [],
+            re = /\S+/g,
+            m,
+            hi = -1,
+            he = -1;
+          if (hl) {
+            hi = t.toLowerCase().indexOf(String(hl).toLowerCase());
+            if (hi >= 0) he = hi + String(hl).length;
+          }
+          while ((m = re.exec(t))) {
+            var s = m.index,
+              e = s + m[0].length;
+            out.push({ t: m[0], hl: hi >= 0 && s < he && e > hi });
+          }
+          return out;
+        }
+        function layoutTitle(ctx, ws, maxW, size) {
+          ctx.font = "800 " + size + 'px Sora, "Segoe UI", sans-serif';
+          var sp = ctx.measureText(" ").width,
+            lines = [],
+            cur = [],
+            w = 0;
+          for (var i = 0; i < ws.length; i++) {
+            var ww = ctx.measureText(ws[i].t).width;
+            if (cur.length && w + sp + ww > maxW) {
+              lines.push({ ws: cur, w: w });
+              cur = [];
+              w = 0;
+            }
+            if (ww > maxW) return null;
+            w += (cur.length ? sp : 0) + ww;
+            cur.push({ t: ws[i].t, hl: ws[i].hl, w: ww });
+          }
+          if (cur.length) lines.push({ ws: cur, w: w });
+          return { lines: lines, sp: sp };
+        }
+        function drawTile(ctx, p, W, H) {
+          var s = W / 1080,
+            h = H / s,
+            f = FMT[p.fmt] || FMT.Caption;
+          ctx.save();
+          ctx.scale(s, s);
+          ctx.fillStyle = "#16191D";
+          ctx.fillRect(0, 0, 1080, h);
+          var spots = [
+              [920, 220],
+              [160, 260],
+              [940, h - 340],
+              [180, h - 300],
+            ],
+            sp = spots[p.d % 4];
+          var g = ctx.createRadialGradient(sp[0], sp[1], 0, sp[0], sp[1], 760);
+          g.addColorStop(0, "rgba(61,123,255,0.42)");
+          g.addColorStop(0.55, "rgba(61,123,255,0.10)");
+          g.addColorStop(1, "rgba(61,123,255,0)");
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 1080, h);
+          ctx.strokeStyle = "rgba(255,255,255,0.035)";
+          ctx.lineWidth = 2;
+          for (var x = 90; x < 1080; x += 90) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+            ctx.stroke();
+          }
+          for (var y = 90; y < h; y += 90) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(1080, y);
+            ctx.stroke();
+          }
+          drawMark(ctx, 80, 78, 62);
+          ctx.textBaseline = "alphabetic";
+          ctx.font = '700 40px Sora, "Segoe UI", sans-serif';
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillText("Stack", 158, 124);
+          var sw = ctx.measureText("Stack").width;
+          ctx.fillStyle = "#86ADFF";
+          ctx.fillText("Shooter", 158 + sw, 124);
+          var lab = p.fmt === "Caption" ? "POST" : f.label.toUpperCase();
+          ctx.font = '800 26px Manrope, "Segoe UI", sans-serif';
+          var lw = ctx.measureText(lab).width + 44;
+          rr(ctx, 1000 - lw, 78, lw, 56, 28);
+          ctx.fillStyle = f.color;
+          ctx.globalAlpha = 0.16;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = f.color;
+          ctx.stroke();
+          ctx.fillStyle = f.color;
+          ctx.fillText(lab, 1000 - lw + 22, 116);
+          var ws = words(p.title, p.hl),
+            maxW = 900,
+            maxLines = h > 1500 ? 6 : 5,
+            size = 118,
+            L = null;
+          for (; size >= 56; size -= 4) {
+            L = layoutTitle(ctx, ws, maxW, size);
+            if (L && L.lines.length <= maxLines) break;
+          }
+          if (!L) L = layoutTitle(ctx, ws, maxW, 56) || { lines: [], sp: 0 };
+          var lh = size * 1.1,
+            blockH = L.lines.length * lh,
+            top = Math.max(300, (h - blockH) / 2 - 40);
+          var eyebrow = (
+            p.series ||
+            PILLAR_LABEL[p.pillar] ||
+            p.pillar ||
+            ""
+          ).toUpperCase();
+          ctx.font = '800 26px Manrope, "Segoe UI", sans-serif';
+          ctx.fillStyle = "#86ADFF";
+          ctx.fillText(eyebrow, 90, top - 34);
+          ctx.fillStyle = "#3D7BFF";
+          ctx.fillRect(90, top - 18, 64, 6);
+          ctx.font = "800 " + size + 'px Sora, "Segoe UI", sans-serif';
+          for (var i = 0; i < L.lines.length; i++) {
+            var cx = 90,
+              ly = top + lh * (i + 1) - size * 0.22;
+            for (var j = 0; j < L.lines[i].ws.length; j++) {
+              var w = L.lines[i].ws[j];
+              ctx.fillStyle = w.hl ? "#5B8CFF" : "#FFFFFF";
+              ctx.fillText(w.t, cx, ly);
+              cx += w.w + L.sp;
+            }
+          }
+          var ay = h - 262;
+          ctx.font = '700 32px Manrope, "Segoe UI", sans-serif';
+          if (p.fmt === "Reel") {
+            ctx.fillStyle = "#3D7BFF";
+            ctx.beginPath();
+            ctx.arc(122, ay, 32, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.moveTo(112, ay - 15);
+            ctx.lineTo(112, ay + 15);
+            ctx.lineTo(138, ay);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = "#E6EBF2";
+            ctx.fillText("Watch the reel", 174, ay + 11);
+          } else if (p.fmt === "Carousel") {
+            ctx.fillStyle = "#E6EBF2";
+            ctx.fillText("Swipe", 90, ay + 11);
+            var tw = ctx.measureText("Swipe").width;
+            ctx.strokeStyle = "#5B8CFF";
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(110 + tw, ay);
+            ctx.lineTo(170 + tw, ay);
+            ctx.moveTo(152 + tw, ay - 16);
+            ctx.lineTo(170 + tw, ay);
+            ctx.lineTo(152 + tw, ay + 16);
+            ctx.stroke();
+            for (var k = 0; k < 5; k++) {
+              ctx.fillStyle = k === 0 ? "#5B8CFF" : "rgba(255,255,255,.25)";
+              ctx.beginPath();
+              ctx.arc(860 + k * 30, ay, k === 0 ? 9 : 7, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          } else {
+            ctx.fillStyle = "#E6EBF2";
+            ctx.fillText("Read the caption", 90, ay + 11);
+            var tw2 = ctx.measureText("Read the caption").width;
+            ctx.strokeStyle = "#F2B64C";
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(126 + tw2, ay - 18);
+            ctx.lineTo(126 + tw2, ay + 16);
+            ctx.moveTo(112 + tw2, ay + 2);
+            ctx.lineTo(126 + tw2, ay + 16);
+            ctx.lineTo(140 + tw2, ay + 2);
+            ctx.stroke();
+          }
+          ctx.fillStyle = "rgba(255,255,255,.14)";
+          ctx.fillRect(90, h - 190, 900, 2);
+          ctx.font = '600 30px Manrope, "Segoe UI", sans-serif';
+          ctx.fillStyle = "#98A2B1";
+          ctx.fillText("@stackshooterofficial", 90, h - 118);
+          var url = "stackshooter.com";
+          ctx.fillText(url, 990 - ctx.measureText(url).width, h - 118);
+          ctx.restore();
+        }
+        function paintCanvas(c, p, full) {
+          var W = full ? FMT[p.fmt].size[0] : 432,
+            H = full ? FMT[p.fmt].size[1] : 540;
+          c.width = W;
+          c.height = H;
+          drawTile(c.getContext("2d"), p, W, H);
+        }
+        function thumbHTML(p) {
+          var src = imgSrc(p);
+          if (src)
+            return (
+              '<span class="thumb"><img alt="Your graphic for day ' +
+              p.d +
+              '" src="' +
+              esc(src) +
+              '"><span class="own">Your graphic</span></span>'
+            );
+          return (
+            '<span class="thumb"><canvas data-day="' +
+            p.d +
+            '" aria-label="Generated graphic: ' +
+            esc(p.title) +
+            '"></canvas></span>'
+          );
+        }
+        function paintAll(root) {
+          var cs = (root || document).querySelectorAll("canvas[data-day]");
+          for (var i = 0; i < cs.length; i++) {
+            var p = post(+cs[i].getAttribute("data-day"));
+            if (p) paintCanvas(cs[i], p, false);
+          }
+        }
+
+        /* ---------- page ---------- */
+        function counts() {
+          var c = { Reel: 0, Carousel: 0, Caption: 0, posted: 0 };
+          S.posts.forEach(function (p) {
+            c[p.fmt] = (c[p.fmt] || 0) + 1;
+            if (p.status === "Posted") c.posted++;
+          });
+          return c;
+        }
+        function markSVG() {
+          return '<svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 4h44l-8 18H6z" fill="#3D7BFF"/><path d="M10 23h44l-8 18H2z" fill="#86ADFF"/><path d="M14 42h44l-8 18H6z" fill="#2456D6"/></svg>';
+        }
+        function render() {
+          var c = counts(),
+            n = S.posts.length,
+            pct = Math.round((c.posted / n) * 100);
+          var h = '<div class="wrap">';
+          h +=
+            '<header><div class="brand">' +
+            markSVG() +
+            '<span>Stack<b>Shooter</b></span><span class="sep">/</span><span class="sub">Content calendar</span></div>';
+          h +=
+            '<div class="hero"><div><h1>November 2026: <em>30 days</em> of content</h1><p class="lede">Faceless Reels built with 3D motion graphics and UGC-style screen recordings, plus carousels and caption posts, all aimed at one goal: more followers and more enquiries. Tap any day for the hooks, script, voiceover, image prompts, caption and hashtags.</p></div>';
+          h +=
+            '<div class="platforms"><span class="plat">Instagram</span><span class="plat">Facebook</span><span class="plat">LinkedIn</span></div></div></header>';
+          h += '<section class="stats" aria-label="Summary">';
+          ["Reel", "Carousel", "Caption"].forEach(function (k) {
+            h +=
+              '<div class="stat"><span class="k"><span class="dot" style="background:' +
+              FMT[k].color +
+              '"></span>' +
+              FMT[k].plural +
+              '</span><span class="v">' +
+              c[k] +
+              "</span></div>";
+          });
+          h +=
+            '<div class="stat"><span class="k"><span class="dot" style="background:var(--posted)"></span>Posted</span><span class="v">' +
+            c.posted +
+            " <small>of " +
+            n +
+            '</small></span><span class="bar"><i style="width:' +
+            pct +
+            '%"></i></span></div></section>';
+          h +=
+            '<nav class="toolbar" aria-label="Calendar controls"><div class="tgroup"><div class="seg" role="group" aria-label="View">' +
+            '<button id="v-cal" aria-pressed="' +
+            (view === "calendar") +
+            '">Calendar</button><button id="v-list" aria-pressed="' +
+            (view === "list") +
+            '">List</button></div>';
+          [
+            ["all", "All"],
+            ["Reel", "Reels"],
+            ["Carousel", "Carousels"],
+            ["Caption", "Captions"],
+          ].forEach(function (f) {
+            h +=
+              '<button class="chip" data-filter="' +
+              f[0] +
+              '" aria-pressed="' +
+              (filter === f[0]) +
+              '">' +
+              (f[0] !== "all"
+                ? '<span class="dot" style="background:' +
+                  FMT[f[0]].color +
+                  '"></span>'
+                : "") +
+              f[1] +
+              "</button>";
+          });
+          h +=
+            '</div><div class="tgroup"><span class="savechip" id="savechip"></span><button class="btn" id="copy-sheet">Copy for Google Sheets</button><button class="btn" id="dl-csv">Download CSV</button></div></nav>';
+          h +=
+            '<main id="main">' +
+            (view === "calendar" ? calHTML() : listHTML()) +
+            "</main>";
+          h += strategyHTML();
+          h +=
+            "<footer><span>StackShooter · We design. We build. You grow.</span><span>support.stackshooter@gmail.com</span><span>WhatsApp +91 95552 99718</span><span>stackshooter.com</span></footer>";
+          h += "</div>";
+          app.innerHTML = h;
+          paintAll(app);
+          bind();
+          saveChip();
+        }
+        function calHTML() {
+          var h = '<div class="cal" role="grid" aria-label="November 2026">';
+          DOW.forEach(function (d) {
+            h += '<div class="dow" role="columnheader">' + d + "</div>";
+          });
+          var first = dateOf(1).getDay();
+          for (var i = 0; i < first; i++)
+            h += '<div class="cell empty" aria-hidden="true"></div>';
+          S.posts.forEach(function (p) {
+            h +=
+              '<button class="cell' +
+              (shown(p) ? "" : " dim") +
+              '" data-open="' +
+              p.d +
+              '" aria-label="' +
+              esc(dateLabel(p.d) + ", " + FMT[p.fmt].label + ": " + p.title) +
+              '">' +
+              '<span class="top"><span class="dnum">' +
+              p.d +
+              '</span><span class="fmt ' +
+              p.fmt +
+              '">' +
+              (p.fmt === "Caption" ? "Post" : FMT[p.fmt].label) +
+              '</span><span class="dot" title="' +
+              esc(p.status) +
+              '" style="background:' +
+              statusColor(p.status) +
+              '"></span></span>' +
+              thumbHTML(p) +
+              '<span class="ctitle">' +
+              esc(p.title) +
+              "</span>" +
+              '<span class="cmeta"><span class="ctime">' +
+              esc((p.times && p.times.ig) || "") +
+              '</span><span class="st">' +
+              esc(p.status) +
+              "</span></span></button>";
+          });
+          var tail = (7 - ((first + S.posts.length) % 7)) % 7;
+          for (var j = 0; j < tail; j++)
+            h += '<div class="cell empty" aria-hidden="true"></div>';
+          return h + "</div>";
+        }
+        function listHTML() {
+          var h = '<div class="weeks">';
+          WEEKS.forEach(function (w) {
+            var ps = S.posts.filter(function (p) {
+              return p.d >= w.from && p.d <= w.to && shown(p);
+            });
+            if (!ps.length) return;
+            h +=
+              '<section class="week"><h2>' +
+              esc(w.name) +
+              '</h2><p class="wsub">' +
+              esc(w.sub) +
+              '</p><div class="rows">';
+            ps.forEach(function (p) {
+              var hook = (p.hooks && p.hooks[0]) || "";
+              h +=
+                '<button class="row" data-open="' +
+                p.d +
+                '">' +
+                thumbHTML(p) +
+                '<span class="rbody"><span class="rhead"><strong>' +
+                esc(dateLabel(p.d)) +
+                '</strong><span class="fmt ' +
+                p.fmt +
+                '">' +
+                FMT[p.fmt].label +
+                "</span>" +
+                (p.series
+                  ? '<span class="series">' + esc(p.series) + "</span>"
+                  : "") +
+                '<span class="st"><span class="dot" style="background:' +
+                statusColor(p.status) +
+                '"></span>' +
+                esc(p.status) +
+                "</span></span>" +
+                '<span class="rtitle">' +
+                esc(p.title) +
+                "</span>" +
+                (hook
+                  ? '<span class="rhook">Hook: “' + esc(hook) + "”</span>"
+                  : "") +
+                '<span class="rsolve"><b>Solves:</b> ' +
+                esc(p.problem || "") +
+                "</span>" +
+                '<span class="times">' +
+                esc(timesLine(p)) +
+                " · CTA: " +
+                esc(p.cta) +
+                "</span></span></button>";
+            });
+            h += "</div></section>";
+          });
+          return h + "</div>";
+        }
+        function strategyHTML() {
+          return (
+            '<h2 class="sectitle">Posting schedule & growth plan</h2><section class="strategy">' +
+            '<div class="card wide"><h3>When and how often to post (IST)</h3><div class="tablewrap"><table class="sched"><thead><tr><th>Platform</th><th>How often</th><th>Best time</th><th>How to post</th></tr></thead><tbody>' +
+            "<tr><td>Instagram</td><td><b>1 feed post every day</b> (15 Reels, 9 carousels, 6 posts) + <b>3–5 Stories daily</b></td><td><b>Mon–Fri 7:30 PM</b> · Sat 8:30 PM · Sun 12:30 PM</td><td>Share every Reel to Stories with a poll or question sticker.</td></tr>" +
+            "<tr><td>Facebook</td><td>Same 30 posts, cross-posted from Instagram</td><td>Same time as Instagram</td><td>Reels as Facebook Reels; carousels as multi-image posts.</td></tr>" +
+            "<tr><td>LinkedIn</td><td><b>5 a week</b>, weekdays only (21 posts)</td><td><b>10:30 AM</b>, Tue–Thu strongest</td><td>Carousels as PDF documents, caption posts text-first, Reels as native video with subtitles.</td></tr>" +
+            '</tbody></table></div><p class="small">These are starting points from 2026 posting-time studies for India. After two weeks, open Instagram Insights → Most active times and move your slot to match your own followers.</p></div>' +
+            '<div class="card"><h3>Weekly rhythm</h3><ul><li><b>Mon</b> save-worthy carousel guide</li><li><b>Tue</b> Reel · <b>Website Doctor</b> series</li><li><b>Wed</b> LinkedIn-first story post</li><li><b>Thu</b> Reel · <b>Industry Fix</b> series</li><li><b>Fri</b> checklist carousel</li><li><b>Sat</b> 3D / trend Reel</li><li><b>Sun</b> engagement Reel or poll</li></ul><p class="small">Two named series give people a reason to follow for the next episode.</p></div>' +
+            '<div class="card"><h3>Making faceless Reels</h3><ul><li><b>3D shots:</b> tap “Copy as AI prompt” on any scene and paste it into your AI video tool, or build the shot in Blender or Spline.</li><li><b>UGC shots:</b> screen-record your phone or laptop at 9:16, then add the on-screen text as motion type.</li><li><b>Voiceover:</b> Hinglish, a little fast and energetic. Record it yourself or use an AI voice.</li><li>Hook on screen within the first 1.5 seconds. Burn in subtitles. Keep it 20–30 seconds.</li><li>Use Instagram Trial Reels to test hooks 2 and 3 with non-followers.</li></ul></div>' +
+            '<div class="card"><h3>Habits that grow followers</h3><ul><li>Reply to every comment in the first hour.</li><li>Turn the best comments and questions into reply Reels.</li><li>Pin 3 posts: Day 1 launch, Day 2 services, Day 25 free audit.</li><li>Send collab invites to clients when you feature their industry.</li><li>Spend 15 minutes a day commenting on posts by businesses you want as clients.</li></ul></div>' +
+            '<div class="card"><h3>Hashtags</h3><ul><li><b>Instagram allows only 5 hashtags per post</b>, so each day has exactly 5 in the Instagram box.</li><li><b>Facebook & LinkedIn:</b> add the 2 extra tags (7 total). The “Copy for LinkedIn / Facebook” button does this for you.</li><li>Keep #StackShooter on every post; the other tags rotate by topic.</li></ul></div>' +
+            '<div class="card"><h3>DM keywords to set up</h3><ul><li>Save a quick reply for each keyword so every DM gets an instant answer and a booking link.</li></ul><div class="kw"><span>AUDIT</span><span>SPEED</span><span>PROPERTY</span><span>STORE</span><span>MAPS</span><span>BOOKING</span><span>CRM</span><span>CLINIC</span><span>LOCAL</span><span>APP</span><span>REVIEW</span><span>ADMISSION</span><span>MAKEOVER</span><span>DESIGN</span><span>LAUNCH</span></div></div>' +
+            '<div class="card wide"><h3>Brand style for image prompts</h3><p class="small" style="margin-top:0">Added to every prompt you copy, so all your visuals match. Generate images without text, then add the slide text in your design tool; AI image tools garble lettering.</p>' +
+            '<textarea id="style-input" rows="3" aria-label="Brand style for image prompts">' +
+            esc(S.style || "") +
+            '</textarea><div class="btnrow" style="margin-top:8px"><button class="btn" id="style-save">Save style</button></div></div>' +
+            "</section>"
+          );
+        }
+        function bind() {
+          document.getElementById("v-cal").onclick = function () {
+            setView("calendar");
+          };
+          document.getElementById("v-list").onclick = function () {
+            setView("list");
+          };
+          Array.prototype.forEach.call(
+            app.querySelectorAll("[data-filter]"),
+            function (b) {
+              b.onclick = function () {
+                filter = b.getAttribute("data-filter");
+                render();
+              };
+            },
+          );
+          Array.prototype.forEach.call(
+            app.querySelectorAll("[data-open]"),
+            function (b) {
+              b.onclick = function () {
+                openEditor(+b.getAttribute("data-open"));
+              };
+            },
+          );
+          document.getElementById("dl-csv").onclick = downloadCSV;
+          document.getElementById("copy-sheet").onclick = copySheet;
+          document.getElementById("style-save").onclick = function () {
+            var v = document.getElementById("style-input").value.trim();
+            var next = JSON.parse(JSON.stringify(S));
+            next.style = v;
+            next.savedAt = Date.now();
+            persist(next, "Brand style saved", function () {
+              S = next;
+              render();
+            });
+          };
+        }
+        function setView(v) {
+          view = v;
+          try {
+            sessionStorage.setItem("ss-view", v);
+          } catch (e) {}
+          render();
+        }
+        function saveChip() {
+          var el = document.getElementById("savechip");
+          if (!el) return;
+          var t = "";
+          if (caps.ready) {
+            if (caps.artifact && !caps.readonly && !localOnly)
+              t =
+                '<span class="dot" style="background:var(--posted)"></span>Edits save to this page';
+            else if (localOnly)
+              t =
+                '<span class="dot" style="background:var(--caption)"></span>Edits saved on this device only';
+            else
+              t =
+                '<span class="dot" style="background:var(--caption)"></span>Edits save on this device';
+          }
+          el.innerHTML = t;
+        }
+
+        /* ---------- editor ---------- */
+        var ed = null;
+        function openEditor(d) {
+          var p = post(d);
+          if (!p) return;
+          ed = {
+            d: d,
+            draft: JSON.parse(JSON.stringify(p)),
+            dirty: false,
+            last: document.activeElement,
+          };
+          var el = document.createElement("div");
+          el.className = "scrim";
+          el.id = "scrim";
+          el.innerHTML = editorHTML(ed.draft);
+          document.body.appendChild(el);
+          document.body.style.overflow = "hidden";
+          bindEditor(el);
+          var c = el.querySelector("#e-close");
+          if (c) c.focus({ preventScroll: true });
+        }
+        function fld(label, k, val, opts) {
+          opts = opts || {};
+          var id =
+            "e-" + k.replace(/\./g, "-") + (opts.i != null ? "-" + opts.i : "");
+          var data =
+            ' data-k="' +
+            k +
+            '"' +
+            (opts.arr
+              ? ' data-arr="' + opts.arr + '" data-i="' + opts.i + '"'
+              : "");
+          var ctl = opts.rows
+            ? '<textarea id="' +
+              id +
+              '" rows="' +
+              opts.rows +
+              '"' +
+              data +
+              ">" +
+              esc(val) +
+              "</textarea>"
+            : '<input id="' + id + '"' + data + ' value="' + esc(val) + '">';
+          return (
+            '<div class="f"' +
+            (opts.span ? ' style="grid-column:' + opts.span + '"' : "") +
+            '><label for="' +
+            id +
+            '">' +
+            label +
+            (opts.note
+              ? " <span" +
+                (opts.noteId ? ' id="' + opts.noteId + '"' : "") +
+                ">" +
+                opts.note +
+                "</span>"
+              : "") +
+            "</label>" +
+            ctl +
+            "</div>"
+          );
+        }
+        function editorHTML(p) {
+          var f = FMT[p.fmt],
+            src = imgSrc(p),
+            isReel = p.fmt === "Reel";
+          var h =
+            '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="e-h">';
+          h +=
+            '<div class="shead"><h2 id="e-h">Day ' +
+            p.d +
+            " · " +
+            esc(dateLabel(p.d)) +
+            (p.series ? " · " + esc(p.series) : "") +
+            '</h2><div class="nav"><button class="icon" data-act="prev" aria-label="Previous day"' +
+            (p.d <= 1 ? " disabled" : "") +
+            '>‹</button><button class="icon" data-act="next" aria-label="Next day"' +
+            (p.d >= S.posts.length ? " disabled" : "") +
+            '>›</button><button class="icon" id="e-close" data-act="close" aria-label="Close">✕</button></div></div>';
+          // left
+          h +=
+            '<div class="sbody"><div class="pv"><span class="thumb" id="e-thumb">' +
+            (src
+              ? '<img alt="Your graphic" src="' + esc(src) + '">'
+              : '<canvas id="e-canvas" aria-label="Generated cover graphic"></canvas>') +
+            "</span>";
+          h +=
+            '<p class="hint">' +
+            (src
+              ? "Showing your uploaded graphic."
+              : "Auto-made cover from the headline. Use it as the Reel cover or slide 1, or upload your own.") +
+            "</p>";
+          h +=
+            '<div class="pvbtns"><label class="btn" for="e-file">Upload your graphic</label><input type="file" id="e-file" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">';
+          h +=
+            (src
+              ? '<button class="btn" data-act="rmimg">Use generated graphic</button>'
+              : '<button class="btn" data-act="png">Download PNG (' +
+                f.size[0] +
+                "×" +
+                f.size[1] +
+                ")</button>") + "</div>";
+          h +=
+            '<div class="tips"><b>Posting this ' +
+            f.label.toLowerCase() +
+            "</b><ul>" +
+            f.tips
+              .map(function (t) {
+                return "<li>" + t + "</li>";
+              })
+              .join("") +
+            "<li><b>Times:</b> " +
+            esc(timesLine(p)) +
+            "</li></ul></div></div>";
+          // right
+          h += '<div class="form">';
+          // basics
+          h += '<section class="sec"><h3>Basics</h3><div class="grid4">';
+          h +=
+            '<div class="f"><label for="e-fmt">Format</label><select id="e-fmt" data-k="fmt">' +
+            ["Reel", "Carousel", "Caption"]
+              .map(function (k) {
+                return (
+                  '<option value="' +
+                  k +
+                  '"' +
+                  (p.fmt === k ? " selected" : "") +
+                  ">" +
+                  FMT[k].label +
+                  "</option>"
+                );
+              })
+              .join("") +
+            "</select></div>";
+          h +=
+            '<div class="f"><label for="e-pillar">Theme</label><select id="e-pillar" data-k="pillar">' +
+            PILLARS.map(function (k) {
+              return (
+                '<option value="' +
+                k +
+                '"' +
+                (p.pillar === k ? " selected" : "") +
+                ">" +
+                PILLAR_LABEL[k] +
+                "</option>"
+              );
+            }).join("") +
+            "</select></div>";
+          h +=
+            fld("Series", "series", p.series) +
+            fld("Call to action", "cta", p.cta);
+          h +=
+            fld("Instagram time", "times.ig", (p.times || {}).ig) +
+            fld("Facebook time", "times.fb", (p.times || {}).fb) +
+            fld("LinkedIn time", "times.li", (p.times || {}).li, {
+              span: "span 2",
+            });
+          h +=
+            '</div><div class="f"><label id="e-st-l">Status</label><div class="statusseg" role="group" aria-labelledby="e-st-l">' +
+            STATUSES.map(function (s) {
+              return (
+                '<button data-st="' +
+                s[0] +
+                '" style="color:' +
+                (p.status === s[0] ? s[2] : "") +
+                '" aria-pressed="' +
+                (p.status === s[0]) +
+                '"><span class="dot" style="background:' +
+                s[1] +
+                '"></span>' +
+                s[0] +
+                "</button>"
+              );
+            }).join("") +
+            "</div></div>";
+          h +=
+            '<div class="grid2">' +
+            fld("Headline on cover", "title", p.title) +
+            fld("Words in blue", "hl", p.hl, {
+              note: "must appear in the headline",
+            }) +
+            "</div></section>";
+          // hook & angle
+          h +=
+            '<section class="sec"><h3>' +
+            (isReel ? "Hooks & angle" : "Angle") +
+            "</h3>";
+          if (isReel) {
+            var hk = p.hooks || [];
+            while (hk.length < 3) hk.push("");
+            p.hooks = hk;
+            h += fld(
+              "Hook 1 · main (first 1.5 sec, on screen + voice)",
+              "hooks",
+              hk[0],
+              { arr: "hooks", i: 0 },
+            );
+            h +=
+              '<div class="grid2">' +
+              fld("Hook 2 · test with Trial Reels", "hooks", hk[1], {
+                arr: "hooks",
+                i: 1,
+              }) +
+              fld("Hook 3 · alternate", "hooks", hk[2], {
+                arr: "hooks",
+                i: 2,
+              }) +
+              "</div>";
+          }
+          h +=
+            '<div class="grid2">' +
+            fld("Market problem it tackles", "problem", p.problem, {
+              rows: 3,
+            }) +
+            fld("What StackShooter solves", "solution", p.solution, {
+              rows: 3,
+            }) +
+            "</div></section>";
+          // script or slides
+          if (isReel) {
+            h +=
+              '<section class="sec"><h3>Reel script · faceless</h3>' +
+              fld("Production style", "style", p.style, {
+                note: "3D motion graphics / UGC screen recording / kinetic type",
+              });
+            (p.scenes || []).forEach(function (s, i) {
+              h +=
+                '<div class="item"><div class="ihead"><strong>Scene ' +
+                (i + 1) +
+                '</strong><span class="btnrow"><button class="mini" data-act="copy-scene" data-i="' +
+                i +
+                '">Copy as AI prompt</button><button class="mini warn" data-act="rm-scene" data-i="' +
+                i +
+                '" aria-label="Remove scene ' +
+                (i + 1) +
+                '">Remove</button></span></div>' +
+                '<div class="irow">' +
+                fld("Time", "t", s.t, { arr: "scenes", i: i }) +
+                fld("Text on screen", "txt", s.txt, { arr: "scenes", i: i }) +
+                "</div>" +
+                fld("Visual / animation", "v", s.v, {
+                  arr: "scenes",
+                  i: i,
+                  rows: 3,
+                }) +
+                "</div>";
+            });
+            h +=
+              '<div class="btnrow"><button class="mini" data-act="add-scene">+ Add scene</button><button class="mini" data-act="copy-allscenes">Copy all scene prompts</button></div>';
+            h += fld("Voiceover script (Hinglish)", "vo", p.vo, {
+              rows: 6,
+              note: '<span id="e-voc"></span>',
+            });
+            h +=
+              '<div class="btnrow"><button class="mini" data-act="copy-vo">Copy voiceover</button></div>';
+            h += fld("Music & sound effects", "audio", p.audio) + "</section>";
+          } else {
+            h +=
+              '<section class="sec"><h3>' +
+              (p.fmt === "Carousel"
+                ? "Slides & image prompts"
+                : "Graphic & image prompt") +
+              "</h3>";
+            (p.slides || []).forEach(function (s, i) {
+              h +=
+                '<div class="item"><div class="ihead"><strong>' +
+                (p.fmt === "Carousel"
+                  ? "Slide " + (i + 1)
+                  : "Graphic " + (i + 1)) +
+                '</strong><span class="btnrow"><button class="mini" data-act="copy-slide" data-i="' +
+                i +
+                '">Copy image prompt</button><button class="mini warn" data-act="rm-slide" data-i="' +
+                i +
+                '" aria-label="Remove slide ' +
+                (i + 1) +
+                '">Remove</button></span></div>' +
+                fld("Text on slide", "copy", s.copy, {
+                  arr: "slides",
+                  i: i,
+                  rows: 3,
+                }) +
+                fld(
+                  "Image prompt (brand style is added when you copy)",
+                  "prompt",
+                  s.prompt,
+                  { arr: "slides", i: i, rows: 2 },
+                ) +
+                "</div>";
+            });
+            h +=
+              '<div class="btnrow"><button class="mini" data-act="add-slide">+ Add slide</button><button class="mini" data-act="copy-allslides">Copy all prompts</button></div></section>';
+          }
+          // caption
+          h += '<section class="sec"><h3>Caption & hashtags</h3>';
+          h += fld("Caption · story + CTA", "caption", p.caption, {
+            rows: 12,
+            note: "",
+            noteId: "e-cc",
+          });
+          h +=
+            '<div class="grid2">' +
+            fld("Instagram hashtags (max 5)", "tags", p.tags, {
+              rows: 2,
+              note: "",
+              noteId: "e-tc",
+            }) +
+            fld("Extra 2 for Facebook & LinkedIn", "tags2", p.tags2, {
+              rows: 2,
+            }) +
+            "</div>";
+          h +=
+            '<div class="btnrow"><button class="mini" data-act="copy-ig">Copy for Instagram</button><button class="mini" data-act="copy-li">Copy for LinkedIn / Facebook</button></div></section>';
+          h += "</div></div>";
+          h +=
+            '<div class="sfoot"><div class="tgroup"><button class="btn" data-act="copy-brief">Copy full brief</button><span class="note" id="e-note"></span></div><div class="tgroup"><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="save">Save changes</button></div></div>';
+          return h + "</div>";
+        }
+        function counters(el) {
+          var p = ed.draft,
+            cap = String(p.caption || ""),
+            tags = String(p.tags || "");
+          var total = cap.length + 2 + tags.length,
+            n = tagCount(tags);
+          var cc = el.querySelector("#e-cc");
+          if (cc)
+            cc.innerHTML =
+              (total > 2200 ? '<span class="bad">' : "<span>") +
+              total.toLocaleString() +
+              " / 2,200 with hashtags</span>";
+          var tc = el.querySelector("#e-tc");
+          if (tc)
+            tc.innerHTML =
+              n > 5
+                ? '<span class="bad">' + n + " tags · Instagram allows 5</span>"
+                : n + " / 5";
+          var voc = el.querySelector("#e-voc");
+          if (voc) {
+            var w = (String(p.vo || "").match(/\S+/g) || []).length;
+            voc.textContent = w + " words ≈ " + Math.round(w / 2.6) + " sec";
+          }
+        }
+        function setPath(obj, k, v) {
+          var ps = k.split(".");
+          var o = obj;
+          for (var i = 0; i < ps.length - 1; i++) {
+            o[ps[i]] = o[ps[i]] || {};
+            o = o[ps[i]];
+          }
+          o[ps[ps.length - 1]] = v;
+        }
+        function bindEditor(el) {
+          var cv = el.querySelector("#e-canvas");
+          function repaint() {
+            if (cv) paintCanvas(cv, ed.draft, false);
+          }
+          repaint();
+          counters(el);
+          function mark() {
+            ed.dirty = true;
+            var n = el.querySelector("#e-note");
+            if (n) n.textContent = "Unsaved changes";
+          }
+          el.oninput = function (e) {
+            var t = e.target,
+              k = t.getAttribute && t.getAttribute("data-k");
+            if (!k) return;
+            var arr = t.getAttribute("data-arr");
+            if (arr === "hooks") {
+              ed.draft.hooks[+t.getAttribute("data-i")] = t.value;
+            } else if (arr) {
+              ed.draft[arr][+t.getAttribute("data-i")][k] = t.value;
+            } else if (k !== "fmt") {
+              setPath(ed.draft, k, t.value);
+            }
+            mark();
+            counters(el);
+            if (k === "title" || k === "hl" || k === "pillar" || k === "series")
+              repaint();
+          };
+          el.onchange = function (e) {
+            var t = e.target;
+            if (t.id === "e-fmt") {
+              var p = ed.draft;
+              p.fmt = t.value;
+              if (p.fmt === "Reel") {
+                if (!p.scenes || !p.scenes.length)
+                  p.scenes = [{ t: "0–2s", v: "", txt: "" }];
+                if (!p.hooks) p.hooks = ["", "", ""];
+              } else if (!p.slides || !p.slides.length)
+                p.slides = [{ copy: "", prompt: "" }];
+              mark();
+              rebuild(el);
+            } else if (t.id === "e-file") {
+              var file = t.files && t.files[0];
+              if (file) handleUpload(file, el);
+            }
+          };
+          el.onclick = function (e) {
+            if (e.target === el) {
+              closeEditor();
+              return;
+            }
+            var b =
+              e.target.closest && e.target.closest("[data-act],[data-st]");
+            if (!b) return;
+            var p = ed.draft,
+              i = +b.getAttribute("data-i");
+            if (b.hasAttribute("data-st")) {
+              p.status = b.getAttribute("data-st");
+              mark();
+              Array.prototype.forEach.call(
+                el.querySelectorAll("[data-st]"),
+                function (x) {
+                  var on = x === b;
+                  x.setAttribute("aria-pressed", on);
+                  x.style.color = "";
+                  if (on)
+                    STATUSES.forEach(function (s) {
+                      if (s[0] === p.status) x.style.color = s[2];
+                    });
+                },
+              );
+              return;
+            }
+            switch (b.getAttribute("data-act")) {
+              case "close":
+                closeEditor();
+                break;
+              case "prev":
+                go(-1);
+                break;
+              case "next":
+                go(1);
+                break;
+              case "save":
+                saveDraft();
+                break;
+              case "png":
+                downloadPNG(p);
+                break;
+              case "rmimg":
+                p.img = null;
+                mark();
+                rebuild(el);
+                break;
+              case "add-scene":
+                p.scenes.push({ t: "", v: "", txt: "" });
+                mark();
+                rebuild(el);
+                break;
+              case "rm-scene":
+                p.scenes.splice(i, 1);
+                mark();
+                rebuild(el);
+                break;
+              case "add-slide":
+                p.slides.push({ copy: "", prompt: "" });
+                mark();
+                rebuild(el);
+                break;
+              case "rm-slide":
+                p.slides.splice(i, 1);
+                mark();
+                rebuild(el);
+                break;
+              case "copy-scene":
+                copyText(
+                  promptOf(p.scenes[i].v, "reel"),
+                  "Scene " + (i + 1) + " prompt copied",
+                );
+                break;
+              case "copy-allscenes":
+                copyText(
+                  p.scenes
+                    .map(function (s, j) {
+                      return (
+                        "Scene " +
+                        (j + 1) +
+                        " (" +
+                        s.t +
+                        "): " +
+                        promptOf(s.v, "reel")
+                      );
+                    })
+                    .join("\n\n"),
+                  "All scene prompts copied",
+                );
+                break;
+              case "copy-slide":
+                copyText(
+                  promptOf(p.slides[i].prompt, "img"),
+                  "Slide " + (i + 1) + " prompt copied",
+                );
+                break;
+              case "copy-allslides":
+                copyText(
+                  p.slides
+                    .map(function (s, j) {
+                      return (
+                        "Slide " + (j + 1) + ": " + promptOf(s.prompt, "img")
+                      );
+                    })
+                    .join("\n\n"),
+                  "All image prompts copied",
+                );
+                break;
+              case "copy-vo":
+                copyText(p.vo || "", "Voiceover copied");
+                break;
+              case "copy-ig":
+                copyText(
+                  (p.caption || "") + "\n\n" + (p.tags || ""),
+                  "Instagram caption + 5 hashtags copied",
+                );
+                break;
+              case "copy-li":
+                copyText(
+                  (p.caption || "") +
+                    "\n\n" +
+                    ((p.tags || "") + " " + (p.tags2 || "")).trim(),
+                  "Caption + 7 hashtags copied",
+                );
+                break;
+              case "copy-brief":
+                copyText(brief(p), "Full brief copied");
+                break;
+            }
+          };
+          el.onkeydown = function (e) {
+            if (e.key === "Escape") closeEditor();
+          };
+        }
+        function rebuild(el) {
+          var dirty = ed.dirty,
+            st = el.querySelector(".sbody"),
+            top = st ? st.scrollTop : 0;
+          el.innerHTML = editorHTML(ed.draft);
+          bindEditor(el);
+          var nb = el.querySelector(".sbody");
+          if (nb) nb.scrollTop = top;
+          if (dirty) {
+            ed.dirty = true;
+            el.querySelector("#e-note").textContent = "Unsaved changes";
+          }
+        }
+        function go(dir) {
+          if (ed.dirty) {
+            toast("Save or cancel your changes first");
+            return;
+          }
+          var d = ed.d + dir;
+          if (d < 1 || d > S.posts.length) return;
+          closeEditor(true);
+          openEditor(d);
+        }
+        function closeEditor(silent) {
+          var el = document.getElementById("scrim");
+          if (el) el.remove();
+          document.body.style.overflow = "";
+          if (ed && ed.last && ed.last.focus && silent !== true) {
+            try {
+              ed.last.focus({ preventScroll: true });
+            } catch (e) {}
+          }
+          ed = null;
+        }
+        function handleUpload(file, el) {
+          var note = el.querySelector("#e-note");
+          note.textContent = "Uploading…";
+          var done = function (img) {
+            ed.draft.img = img;
+            ed.dirty = true;
+            rebuild(el);
+            el.querySelector("#e-note").textContent =
+              "Graphic added. Save to keep it.";
+          };
+          if (caps.assets) {
+            caps.assets.upload(file).then(
+              function (r) {
+                done({ id: r.id });
+              },
+              function (err) {
+                var c = err && err.code;
+                if (c === "too_large")
+                  note.textContent =
+                    "That file is over 20 MB. Try a smaller image.";
+                else if (c === "unsupported_type")
+                  note.textContent = "Use a PNG, JPG, WebP or GIF image.";
+                else embedImage(file, done, note);
+              },
+            );
+          } else embedImage(file, done, note);
+        }
+        function embedImage(file, done, note) {
+          var r = new FileReader();
+          r.onload = function () {
+            var im = new Image();
+            im.onload = function () {
+              var sc = Math.min(1, 1080 / im.width),
+                c = document.createElement("canvas");
+              c.width = Math.round(im.width * sc);
+              c.height = Math.round(im.height * sc);
+              c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+              done({ data: c.toDataURL("image/jpeg", 0.82) });
+            };
+            im.onerror = function () {
+              note.textContent = "Couldn’t read that image. Try a PNG or JPG.";
+            };
+            im.src = r.result;
+          };
+          r.readAsDataURL(file);
+        }
+        function brief(p) {
+          var L = [];
+          L.push(
+            "DAY " +
+              p.d +
+              " · " +
+              dateLabel(p.d) +
+              " 2026 · " +
+              FMT[p.fmt].label.toUpperCase() +
+              (p.series ? " · " + p.series : ""),
+          );
+          L.push("Post: " + timesLine(p));
+          L.push("Headline: " + p.title);
+          if (p.fmt === "Reel" && p.hooks) {
+            L.push("");
+            L.push("HOOKS");
+            p.hooks.forEach(function (x, i) {
+              if (x) L.push(i + 1 + ". " + x);
+            });
+          }
+          L.push("");
+          L.push("Problem: " + (p.problem || ""));
+          L.push("We solve: " + (p.solution || ""));
+          if (p.fmt === "Reel") {
+            L.push("");
+            L.push("SCRIPT (" + (p.style || "") + ")");
+            (p.scenes || []).forEach(function (s, i) {
+              L.push("Scene " + (i + 1) + " · " + s.t);
+              L.push("  Visual: " + s.v);
+              if (s.txt) L.push("  On screen: " + s.txt);
+            });
+            L.push("");
+            L.push("VOICEOVER");
+            L.push(p.vo || "");
+            L.push("");
+            L.push("AUDIO: " + (p.audio || ""));
+            L.push("");
+            L.push("SCENE PROMPTS");
+            (p.scenes || []).forEach(function (s, i) {
+              L.push("Scene " + (i + 1) + ": " + promptOf(s.v, "reel"));
+            });
+          } else {
+            L.push("");
+            L.push(p.fmt === "Carousel" ? "SLIDES" : "GRAPHIC");
+            (p.slides || []).forEach(function (s, i) {
+              L.push(
+                "Slide " +
+                  (i + 1) +
+                  " text: " +
+                  String(s.copy || "").replace(/\n/g, " / "),
+              );
+              L.push("  Image prompt: " + promptOf(s.prompt, "img"));
+            });
+          }
+          L.push("");
+          L.push("CAPTION");
+          L.push(p.caption || "");
+          L.push("");
+          L.push("Instagram hashtags: " + (p.tags || ""));
+          L.push("Facebook/LinkedIn extra: " + (p.tags2 || ""));
+          L.push("CTA: " + (p.cta || ""));
+          return L.join("\n");
+        }
+
+        /* ---------- saving ---------- */
+        function saveDraft() {
+          var i;
+          for (i = 0; i < S.posts.length; i++) if (S.posts[i].d === ed.d) break;
+          var next = JSON.parse(JSON.stringify(S));
+          next.posts[i] = ed.draft;
+          next.savedAt = Date.now();
+          var d = ed.d,
+            btn = document.querySelector('[data-act="save"]');
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = "Saving…";
+          }
+          persist(next, "Day " + d + " saved", function () {
+            S = next;
+            closeEditor();
+            render();
+          });
+        }
+        function persist(next, msg, localDone) {
+          if (caps.artifact && !caps.readonly) {
+            try {
+              sessionStorage.setItem("ss-toast", msg);
+            } catch (e) {}
+            caps.artifact.publish(buildDoc(next)).then(
+              function () {
+                try {
+                  localStorage.removeItem(LS_KEY);
+                } catch (e) {}
+              },
+              function (err) {
+                try {
+                  sessionStorage.removeItem("ss-toast");
+                } catch (e) {}
+                var c = err && err.code;
+                if (c === "conflict") {
+                  toast(
+                    "A newer version was saved elsewhere. Reloading it now.",
+                  );
+                  return;
+                }
+                if (
+                  c === "not_writer" ||
+                  c === "not_granted" ||
+                  c === "consent_required" ||
+                  c === "capability_disabled" ||
+                  c === "not_declared"
+                )
+                  caps.readonly = true;
+                saveLocal(next, msg + " on this device only", localDone);
+              },
+            );
+          } else
+            saveLocal(
+              next,
+              msg + (caps.ready ? " on this device" : ""),
+              localDone,
+            );
+        }
+        function saveLocal(next, msg, cb) {
+          try {
+            localStorage.setItem(LS_KEY, JSON.stringify(next));
+            localOnly = true;
+            cb();
+            toast(msg);
+          } catch (e) {
+            cb();
+            toast(
+              "Changed for now, but this browser can’t store it. Use Copy for Google Sheets to keep a copy.",
+            );
+          }
+        }
+        function buildDoc(state) {
+          var css = document.getElementById("app-css").textContent,
+            js = document.getElementById("app-js").textContent;
+          var json = JSON.stringify(state)
+            .replace(/</g, "\\u003c")
+            .split(String.fromCharCode(8232))
+            .join("\\u2028")
+            .split(String.fromCharCode(8233))
+            .join("\\u2029");
+          return (
+            '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+            HEAD +
+            '<style id="app-css">' +
+            css +
+            '</style>\n</head>\n<body>\n<div id="app"></div>\n<script type="application/json" id="state">' +
+            json +
+            SC +
+            '\n<script id="app-js">' +
+            js +
+            SC +
+            "\n</body>\n</html>\n"
+          );
+        }
+
+        /* ---------- export ---------- */
+        var COLS = [
+          "Day",
+          "Date",
+          "Format",
+          "Series",
+          "Theme",
+          "Headline",
+          "Hook 1",
+          "Hook 2",
+          "Hook 3",
+          "Problem",
+          "Solution",
+          "Reel style",
+          "Script / slides",
+          "Voiceover",
+          "Audio",
+          "Caption",
+          "Instagram hashtags",
+          "Extra hashtags (FB/LinkedIn)",
+          "CTA",
+          "Instagram time",
+          "Facebook time",
+          "LinkedIn time",
+          "Status",
+        ];
+        function flat(p) {
+          if (p.fmt === "Reel")
+            return (p.scenes || [])
+              .map(function (s, i) {
+                return (
+                  "Scene " +
+                  (i + 1) +
+                  " (" +
+                  s.t +
+                  "): " +
+                  s.v +
+                  (s.txt ? " | On screen: " + s.txt : "")
+                );
+              })
+              .join("\n");
+          return (p.slides || [])
+            .map(function (s, i) {
+              return (
+                "Slide " +
+                (i + 1) +
+                ": " +
+                String(s.copy || "").replace(/\n/g, " / ") +
+                " | Prompt: " +
+                promptOf(s.prompt, "img")
+              );
+            })
+            .join("\n");
+        }
+        function rowsOut() {
+          return S.posts.map(function (p) {
+            var h = p.hooks || [],
+              t = p.times || {};
+            return [
+              p.d,
+              dateLabel(p.d) + " 2026",
+              FMT[p.fmt].label,
+              p.series,
+              PILLAR_LABEL[p.pillar] || p.pillar,
+              p.title,
+              h[0],
+              h[1],
+              h[2],
+              p.problem,
+              p.solution,
+              p.style,
+              flat(p),
+              p.vo,
+              p.audio,
+              p.caption,
+              p.tags,
+              p.tags2,
+              p.cta,
+              t.ig,
+              t.fb,
+              t.li,
+              p.status,
+            ];
+          });
+        }
+        function q(v) {
+          v = String(v == null ? "" : v);
+          return /[",\n\t]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        }
+        function downloadCSV() {
+          var csv =
+            "﻿" +
+            [COLS]
+              .concat(rowsOut())
+              .map(function (r) {
+                return r.map(q).join(",");
+              })
+              .join("\r\n");
+          if (!caps.downloads) {
+            toast(
+              "Downloads aren’t available here. Use Copy for Google Sheets instead.",
+            );
+            return;
+          }
+          caps.downloads
+            .save({
+              filename: "stackshooter-november-2026-content-calendar.csv",
+              data: csv,
+            })
+            .then(
+              function () {
+                toast("CSV saved");
+              },
+              function (e) {
+                if (e && e.code !== "declined")
+                  toast(
+                    "Couldn’t download here. Use Copy for Google Sheets instead.",
+                  );
+              },
+            );
+        }
+        function copySheet() {
+          copyText(
+            [COLS]
+              .concat(rowsOut())
+              .map(function (r) {
+                return r
+                  .map(function (v) {
+                    v = String(v == null ? "" : v);
+                    return /["\n\t]/.test(v)
+                      ? '"' + v.replace(/"/g, '""') + '"'
+                      : v;
+                  })
+                  .join("\t");
+              })
+              .join("\n"),
+            "Copied. Paste into cell A1 of a Google Sheet.",
+          );
+        }
+        function downloadPNG(p) {
+          if (!caps.downloads) {
+            toast(
+              "Downloads aren’t available here. Open this page on claude.ai to download.",
+            );
+            return;
+          }
+          var c = document.createElement("canvas");
+          paintCanvas(c, p, true);
+          c.toBlob(function (b) {
+            var name =
+              "stackshooter-day-" +
+              (p.d < 10 ? "0" : "") +
+              p.d +
+              "-" +
+              p.fmt.toLowerCase() +
+              ".png";
+            caps.downloads.save({ filename: name, data: b }).then(
+              function () {
+                toast("Graphic saved");
+              },
+              function (e) {
+                if (e && e.code !== "declined")
+                  toast("Couldn’t download the graphic here.");
+              },
+            );
+          }, "image/png");
+        }
+        function copyText(t, msg) {
+          var fallback = function () {
+            var ta = document.createElement("textarea");
+            ta.value = t;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            var s = false;
+            try {
+              s = document.execCommand("copy");
+            } catch (e) {}
+            ta.remove();
+            toast(
+              s ? msg : "Couldn’t copy. Select the text and copy it manually.",
+            );
+          };
+          try {
+            navigator.clipboard.writeText(t).then(function () {
+              toast(msg);
+            }, fallback);
+          } catch (e) {
+            fallback();
+          }
+        }
+        var tt;
+        function toast(m) {
+          var o = document.querySelector(".toast");
+          if (o) o.remove();
+          var el = document.createElement("div");
+          el.className = "toast";
+          el.setAttribute("role", "status");
+          el.textContent = m;
+          document.body.appendChild(el);
+          clearTimeout(tt);
+          tt = setTimeout(function () {
+            el.remove();
+          }, 3200);
+        }
+
+        /* ---------- boot ---------- */
+        render();
+        if (document.fonts && document.fonts.load) {
+          Promise.all([
+            document.fonts.load("800 100px Sora"),
+            document.fonts.load("700 40px Sora"),
+            document.fonts.load("700 30px Manrope"),
+            document.fonts.load("800 26px Manrope"),
+          ]).then(
+            function () {
+              paintAll(document);
+              if (ed) {
+                var c = document.getElementById("e-canvas");
+                if (c) paintCanvas(c, ed.draft, false);
+              }
+            },
+            function () {},
+          );
+        }
+        try {
+          var tm = sessionStorage.getItem("ss-toast");
+          if (tm) {
+            sessionStorage.removeItem("ss-toast");
+            toast(tm);
+          }
+        } catch (e) {}
+        if (window.claude && typeof window.claude.use === "function") {
+          var u = function (n) {
+            try {
+              return Promise.resolve(window.claude.use(n)).catch(function () {
+                return null;
+              });
+            } catch (e) {
+              return Promise.resolve(null);
+            }
+          };
+          Promise.all([u("artifact"), u("assets"), u("downloads")]).then(
+            function (r) {
+              caps.artifact = r[0];
+              caps.assets = r[1];
+              caps.downloads = r[2];
+              caps.ready = true;
+              saveChip();
+            },
+          );
+        } else {
+          caps.ready = true;
+          setTimeout(saveChip, 0);
+        }
+      })();
+    </script>
+  </body>
+</html>
